@@ -1,0 +1,25 @@
+{
+  "name": "elections-timeline",
+  "version": "1.0.0",
+  "description": "Visualizes results from multiple elections in one view (no animations).",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ekenes/elections-timeline.git"
+  },
+  "author": "Kristian Ekenes <kekenes@esri.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ekenes/elections-timeline/issues"
+  },
+  "homepage": "https://github.com/ekenes/elections-timeline#readme",
+  "dependencies": {
+    "@arcgis/core": "^4.27.2",
+    "vite": "^4.3.9"
+  }
+}
