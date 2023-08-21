@@ -57,7 +57,8 @@ export function createSquareSymbolLayer (params: CreateSymbolLayerParams){
     enable: true,
     anchorPoint,
     anchorPointUnits: "Relative",
-    size: 15,
+    size: 10,
+    primitiveName,
     frame: { xmin: 0.0, ymin: 0.0, xmax: 10.0, ymax: 10.0 },
     markerGraphics: [
       {

@@ -109,3 +109,40 @@ export const haloSize = 1;
 export const rColorCIM = rColor.toJSON();
 export const dColorCIM = dColor.toJSON();
 export const oColorCIM = oColor.toJSON();
+
+
+//////////////
+// size stops
+//////////////
+
+// state results layer
+
+export const stateResultsSizeStops = [
+  { value: 0, size: 8 },
+  { value: 100000, size: 10 },
+  { value: 500000, size: 15 },
+  { value: 4000000, size: 20 },
+  { value: 12000000, size: 50 }
+];
+
+// state change layer
+
+export const stateChangeSizeStops = [
+  { value: 0, size: 4 },
+  { value: 10000, size: 8 },
+  { value: 100000, size: 10 },
+  { value: 500000, size: 15 },
+  { value: 2000000, size: 30 }
+];
+
+// county layers
+
+// size is votes as a % of total state votes
+
+export const countySizeStops = [
+  { value: 0, size: 6 },
+  { value: 0.1, size: 12 },
+  { value: 1, size: 24 },
+  { value: 2, size: 32 },
+  { value: 10, size: 50 }
+];
