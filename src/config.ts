@@ -130,11 +130,11 @@ export const stateResultsSizeStops = [
 // state change layer
 
 export const stateChangeSizeStops = [
-  { value: 0, size: 4 },
-  { value: 10000, size: 8 },
-  { value: 100000, size: 10 },
-  { value: 500000, size: 15 },
-  { value: 2000000, size: 30 }
+  { value: 0, size: 2 },
+  { value: 10000, size: 4 },
+  { value: 100000, size: 8 },
+  { value: 500000, size: 16 },
+  { value: 2000000, size: 32 }
 ];
 
 // county layers

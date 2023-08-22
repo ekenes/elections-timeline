@@ -64,7 +64,7 @@ export const sizeTotalChangeExpressionBase = `
   ${sizeFactorChangeTotal}
 
   ${scaleFactorTotal}
-  return sizeFactor * scaleFactor;
+  var size = sizeFactor * scaleFactor;
 `;
 
 interface SizeStop {
@@ -100,13 +100,17 @@ export function createSizePrimitiveOverride(params: ColorPrimitiveOverrideParams
 
         var value = allVotes[0] - allVotes[1];
 
-        When(
-          value > 500000, 30,
-          value > 300000, 20,
-          value > 200000, 15,
-          value > 100000, 10,
-          5
-        );
+        // var size = When(
+        //   value > 500000, 30,
+        //   value > 300000, 20,
+        //   value > 200000, 15,
+        //   value > 100000, 10,
+        //   5
+        // );
+
+        ${sizeTotalChangeExpressionBase}
+
+        return size;
       `,
       returnType: `Default`
     }
@@ -161,13 +165,15 @@ export function createOffsetXPrimitiveOverride(params: ColorPrimitiveOverridePar
 
           var value = allVotes[0] - allVotes[1];
 
-          var size = When(
-            value > 500000, 30,
-            value > 300000, 20,
-            value > 200000, 15,
-            value > 100000, 10,
-            5
-          );
+          // var size = When(
+          //   value > 500000, 30,
+          //   value > 300000, 20,
+          //   value > 200000, 15,
+          //   value > 100000, 10,
+          //   5
+          // );
+
+          ${sizeTotalChangeExpressionBase}
 
           var factor = iif(
             (year == yearStart) ||

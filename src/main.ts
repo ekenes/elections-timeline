@@ -14,7 +14,11 @@ const layer = new FeatureLayer({
 console.log(JSON.stringify((layer.renderer as SimpleRenderer).symbol))
 
 const map = new ArcGISMap({
-  basemap: "streets-vector",
+  basemap: {
+    portalItem: {
+      id: "fbfb62f3599f41e5a77845f863e2872f"
+    }
+  },
   layers: [ layer ]
 });
 
