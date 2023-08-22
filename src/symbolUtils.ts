@@ -12,14 +12,14 @@ interface CreateSymbolLayerParams {
   primitiveName: string,
   color: number[],
   donutEnabled: boolean,
-  anchorPoint: { x: number, y: number },
   outline?: {
     color: number[]
-  }
+  },
+  offsetX: number
 }
 
 export function createSquareSymbolLayer (params: CreateSymbolLayerParams){
-  const { primitiveName, color, donutEnabled, anchorPoint, outline } = params;
+  const { primitiveName, color, donutEnabled, outline, offsetX } = params;
 
   const symbol = donutEnabled ? {
     type: "CIMLineSymbol",
@@ -48,18 +48,22 @@ export function createSquareSymbolLayer (params: CreateSymbolLayerParams){
       type: `CIMSolidStroke`,
       enable: true,
       color: outline.color,
-      width: 1
+      width: 2
     } as any);
   }
+
+  const size = 10;
 
   return {
     type: "CIMVectorMarker",
     enable: true,
-    anchorPoint,
+    anchorPoint: { x: 0, y: 0 },
     anchorPointUnits: "Relative",
-    size: 10,
+    size,
     primitiveName,
     frame: { xmin: 0.0, ymin: 0.0, xmax: 10.0, ymax: 10.0 },
+    offsetX: size * offsetX,
+    offsetY: 0,
     markerGraphics: [
       {
         type: "CIMMarkerGraphic",

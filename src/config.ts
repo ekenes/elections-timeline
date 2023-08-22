@@ -11,6 +11,8 @@ export const stateReferenceScale = 18489200;
 
 export type validYears = 2000 | 2004 | 2008 | 2012 | 2016 | 2020;
 
+export const years = [2004, 2008, 2012, 2016, 2020];
+
 export const results = {
   2000: {
     republican: {
