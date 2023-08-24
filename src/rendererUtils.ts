@@ -16,6 +16,12 @@ function createSymbol () {
       symbol: {
         type: `CIMPointSymbol`,
         symbolLayers: [
+          // createSquareSymbolLayer({
+          //   primitiveName: "election-2000",
+          //   offsetX: -3,
+          //   color: [0,0,0,255],
+          //   donutEnabled: false
+          // }),
           createSquareSymbolLayer({
             primitiveName: "election-2004",
             offsetX: -2,
@@ -49,6 +55,10 @@ function createSymbol () {
         ]
       },
       primitiveOverrides: [
+        // createColorPrimitiveOverride({
+        //   primitiveName: "election-2000",
+        //   year: 2000
+        // }),
         createColorPrimitiveOverride({
           primitiveName: "election-2004",
           year: 2004
@@ -70,6 +80,10 @@ function createSymbol () {
           year: 2020
         }),
 
+        // createSizePrimitiveOverride({
+        //   primitiveName: "election-2000",
+        //   year: 2000
+        // }),
         createSizePrimitiveOverride({
           primitiveName: "election-2004",
           year: 2004
@@ -91,6 +105,10 @@ function createSymbol () {
           year: 2020
         }),
 
+        // createOffsetXPrimitiveOverride({
+        //   primitiveName: "election-2000",
+        //   year: 2000
+        // }),
         createOffsetXPrimitiveOverride({
           primitiveName: "election-2004",
           year: 2004

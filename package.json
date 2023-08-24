@@ -4,7 +4,7 @@
   "description": "Visualizes results from multiple elections in one view (no animations).",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
+    "dev": "npm run build && vite",
     "build": "tsc && vite build --base=/elections-timeline/dist/",
     "preview": "vite preview"
   },

@@ -79,14 +79,6 @@ export function createSizePrimitiveOverride(params) {
 
         var value = allVotes[0] - allVotes[1];
 
-        // var size = When(
-        //   value > 500000, 30,
-        //   value > 300000, 20,
-        //   value > 200000, 15,
-        //   value > 100000, 10,
-        //   5
-        // );
-
         ${sizeTotalChangeExpressionBase}
 
         return size;
@@ -111,13 +103,15 @@ export function createOffsetXPrimitiveOverride(params) {
         }
         var interval = 4;
         var years = [${years}];
-        var yearStart = First(years);
-        var yearEnd = Back(years);
         var selectedYear = ${year};
 
         var numItems = Count(years);
         var isEvenItems = isEven(numItems);
-        var middleIndex = Round(numItems / 2) - 1;
+        var middleIndex = Floor(numItems / 2);
+
+        if(isEvenItems){
+          middleIndex -= 0.5;
+        }
 
         var index = IndexOf(years, selectedYear);
 
@@ -143,19 +137,10 @@ export function createOffsetXPrimitiveOverride(params) {
 
           var value = allVotes[0] - allVotes[1];
 
-          // var size = When(
-          //   value > 500000, 30,
-          //   value > 300000, 20,
-          //   value > 200000, 15,
-          //   value > 100000, 10,
-          //   5
-          // );
-
           ${sizeTotalChangeExpressionBase}
 
           var factor = iif(
-            (year == yearStart) ||
-            (year == yearEnd)
+            (year == yearStart) || (year == yearEnd)
           , 0.5, 1);
 
           offsetX += (size * factor);
