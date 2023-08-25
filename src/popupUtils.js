@@ -42,6 +42,8 @@ export const statePopupTemplate = () => {
             var fieldsTotal = [];
             var colors = [];
             var attributes = {};
+            var mediaInfos = [];
+
             var years = [${years}];
             var candidates = {
               "2000": {
@@ -133,6 +135,11 @@ export const statePopupTemplate = () => {
             var rColor = [${rColor.toJSON()}];
             var dColor = [${dColor.toJSON()}];
             var oColor = [${oColor.toJSON()}];
+            var resultsColors = [rColor, dColor, oColor];
+
+            var rColorHex = "${rColor.toHex()}";
+            var dColorHex = "${dColor.toHex()}";
+            var oColorHex = "${oColor.toHex()}";
 
             for (var i in years){
               var y = Text(years[i]);
@@ -142,19 +149,22 @@ export const statePopupTemplate = () => {
                   name: candidates[y].republican.candidate,
                   votes: $feature[\`SUM_rep_\${y}\`],
                   margin: null,
-                  color: rColor
+                  color: rColor,
+                  hexColor: rColorHex
                 },
                 d: {
                   name: candidates[y].democrat.candidate,
                   votes: $feature[\`SUM_dem_\${y}\`],
                   margin: null,
-                  color: dColor
+                  color: dColor,
+                  hexColor: dColorHex
                 },
                 o: {
                   name: candidates[y].other.candidate,
                   votes: $feature[\`SUM_oth_\${y}\`],
                   margin: null,
-                  color: oColor
+                  color: oColor,
+                  hexColor: oColorHex
                 }
               };
 
@@ -181,25 +191,49 @@ export const statePopupTemplate = () => {
               Push(fieldsMargin, fieldNameMargin);
               Push(fieldsTotal, fieldNameTotal);
               Push(colors, winnerInfo.color);
+
+              var rCandidateName = \`\${results.r.name} (\${y}) - votes\`;
+              var dCandidateName = \`\${results.d.name} (\${y}) - votes\`;
+              var oCandidateName = \`\${results.o.name} (\${y}) - votes\`;
+
+              attributes[rCandidateName] = results.r.votes;
+              attributes[dCandidateName] = results.d.votes;
+              attributes[oCandidateName] = results.o.votes;
+
+              var evFieldName = \`ev_\${y}\`;
+
+              var resultsChart = {
+                type: "barchart",
+                title: \`<span style='color:\${winnerInfo.hexColor}'><b>\${winnerInfo.name}</b></span> won \${$feature.state}'s \${$feature[evFieldName]} electoral votes in \${y}\`,
+                value: {
+                  fields: [
+                    rCandidateName,
+                    dCandidateName,
+                    oCandidateName
+                  ],
+                  colors: resultsColors
+                }
+              };
+
+              Push(mediaInfos, resultsChart);
             }
 
-            console(colors);
+            Insert(mediaInfos, 0, {
+              type: "columnchart",
+              title: "Margin of victory (% points)",
+              value: { fields: fieldsMargin, colors }
+            });
+
+            Insert(mediaInfos, 1, {
+              type: "columnchart",
+              title: "Margin of victory (total)",
+              value: { fields: fieldsTotal, colors }
+            });
 
             return {
               type: "media",
               attributes,
-              mediaInfos: [
-                {
-                  type: "columnchart",
-                  title: "Margin of victory (% points)",
-                  value: { fields: fieldsMargin, colors }
-                },
-                {
-                  type: "columnchart",
-                  title: "Margin of victory (total)",
-                  value: { fields: fieldsTotal, colors }
-                }
-              ]
+              mediaInfos
             };
           `
                 }
