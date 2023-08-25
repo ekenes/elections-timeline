@@ -1,0 +1,80 @@
+html,
+body,
+#viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#results {
+  padding: 10px;
+  background-color: white;
+  font-size: 18pt;
+  font-weight: 400;
+  /* width: 250px; */
+  display: flex;
+  /* flex-direction: #{column; */
+  justify-content: space-between;
+}
+
+
+#current-year{
+  text-align: center;
+  font-size: 18pt;
+}
+
+#dem-results {
+  color:  rgba(60, 108, 204,1);
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#rep-results {
+  color: rgba(220, 75, 0, 1);
+  display: flex;
+  justify-content: space-evenly;
+}
+
+#dem-candidate {
+  margin-right: 0.3em;
+}
+
+#rep-candidate {
+  margin-right: 0.3em;
+}
+
+table td {
+  padding: 3px;
+}
+
+table.popup td.num {
+  text-align: right;
+}
+
+table.popup tr.head {
+  text-align: center;
+  font-weight: bold;
+  /* background-color:rgba(50, 50, 50,0.08); */
+}
+
+.dem {
+  background-color:rgba(60, 108, 204,0.08);
+}
+.rep {
+  background-color:rgba(220, 75, 0, 0.08);
+}
+.oth {
+  background-color:rgba(224, 206, 0, 0.08);
+}
+
+
+.table-container {
+  width:100%;
+  height:100%;
+  text-align: center;
+}
+
+table {
+  margin: 0 auto;
+}

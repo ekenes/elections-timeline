@@ -100,6 +100,13 @@ export const results = {
   }
 }
 
+export let fieldInfos = {
+  title: {
+    state: `{state}`,
+    county: `{county} County, {state}`
+  }
+};
+
 // Renderer config
 
 export const rColor = new Color("rgba(220, 75, 0, 1)");
