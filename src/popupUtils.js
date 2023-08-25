@@ -2,7 +2,7 @@ import PopupTemplate from "@arcgis/core/PopupTemplate";
 import FieldInfo from "@arcgis/core/popup/FieldInfo";
 import FieldInfoFormat from "@arcgis/core/popup/support/FieldInfoFormat";
 import { ExpressionContent, TextContent } from "@arcgis/core/popup/content";
-import { years, fieldInfos, dColor, rColor } from "./config";
+import { years, fieldInfos, dColor, rColor, oColor } from "./config";
 ////////////////////////////////////////////////////
 //
 // STATE
@@ -33,6 +33,176 @@ export const statePopupTemplate = () => {
         content: [
             new TextContent({
                 text: "Lydia"
+            }),
+            new ExpressionContent({
+                expressionInfo: {
+                    expression: `
+            Expects($feature, "*");
+            var fieldsMargin = [];
+            var fieldsTotal = [];
+            var colors = [];
+            var attributes = {};
+            var years = [${years}];
+            var candidates = {
+              "2000": {
+                republican: {
+                  candidate: "Bush",
+                  electoralVotes: 271
+                },
+                democrat: {
+                  candidate: "Gore",
+                  electoralVotes: 266
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2004": {
+                republican: {
+                  candidate: "Bush",
+                  electoralVotes: 286
+                },
+                democrat: {
+                  candidate: "Kerry",
+                  electoralVotes: 251
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2008": {
+                republican: {
+                  candidate: "McCain",
+                  electoralVotes: 173
+                },
+                democrat: {
+                  candidate: "Obama",
+                  electoralVotes: 365
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2012": {
+                republican: {
+                  candidate: "Romney",
+                  electoralVotes: 206
+                },
+                democrat: {
+                  candidate: "Obama",
+                  electoralVotes: 332
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2016": {
+                republican: {
+                  candidate: "Trump",
+                  electoralVotes: 304
+                },
+                democrat: {
+                  candidate: "Clinton",
+                  electoralVotes: 227
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2020": {
+                republican: {
+                  candidate: "Trump",
+                  electoralVotes: 232
+                },
+                democrat: {
+                  candidate: "Biden",
+                  electoralVotes: 306
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              }
+            };
+
+            var rColor = [${rColor.toJSON()}];
+            var dColor = [${dColor.toJSON()}];
+            var oColor = [${oColor.toJSON()}];
+
+            for (var i in years){
+              var y = Text(years[i]);
+
+              var results = {
+                r: {
+                  name: candidates[y].republican.candidate,
+                  votes: $feature[\`SUM_rep_\${y}\`],
+                  margin: null,
+                  color: rColor
+                },
+                d: {
+                  name: candidates[y].democrat.candidate,
+                  votes: $feature[\`SUM_dem_\${y}\`],
+                  margin: null,
+                  color: dColor
+                },
+                o: {
+                  name: candidates[y].other.candidate,
+                  votes: $feature[\`SUM_oth_\${y}\`],
+                  margin: null,
+                  color: oColor
+                }
+              };
+
+              var allVotes = Reverse(Sort([results.r.votes, results.d.votes, results.o.votes]));
+              var sumVotes = Sum(allVotes);
+
+              var winner = Decode(Max(allVotes),
+                results.r.votes, "r",
+                results.d.votes, "d",
+                "o"
+              );
+
+              var marginTotal = allVotes[0] - allVotes[1];
+              var marginPercent = Round(((allVotes[0] / sumVotes) - (allVotes[1] / sumVotes)) * 100, 1);
+
+              results[winner].margin = marginPercent;
+
+              var winnerInfo = results[winner];
+              var fieldNameMargin = \`\${winnerInfo.name} (\${y}) - margin\`;
+              var fieldNameTotal = \`\${winnerInfo.name} (\${y}) - total\`;
+              attributes[fieldNameMargin] = winnerInfo.margin;
+              attributes[fieldNameTotal] = marginTotal;
+
+              Push(fieldsMargin, fieldNameMargin);
+              Push(fieldsTotal, fieldNameTotal);
+              Push(colors, winnerInfo.color);
+            }
+
+            console(colors);
+
+            return {
+              type: "media",
+              attributes,
+              mediaInfos: [
+                {
+                  type: "columnchart",
+                  title: "Margin of victory (% points)",
+                  value: { fields: fieldsMargin, colors }
+                },
+                {
+                  type: "columnchart",
+                  title: "Margin of victory (total)",
+                  value: { fields: fieldsTotal, colors }
+                }
+              ]
+            };
+          `
+                }
             }),
             new ExpressionContent({
                 expressionInfo: {
@@ -158,7 +328,6 @@ export const statePopupTemplate = () => {
                   margin: "-"
                 }
               };
-
 
               var allVotes = Reverse(Sort([results.r.votes, results.d.votes, results.o.votes]));
               var sumVotes = Sum(allVotes);

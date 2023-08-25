@@ -1,4 +1,3 @@
-import "@arcgis/core/assets/esri/themes/light/main.css";
 import ArcGISMap from "@arcgis/core/Map.js";
 import MapView from "@arcgis/core/views/MapView.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
