@@ -1,7 +1,7 @@
 import PopupTemplate from "@arcgis/core/PopupTemplate";
 import FieldInfo from "@arcgis/core/popup/FieldInfo";
 import FieldInfoFormat from "@arcgis/core/popup/support/FieldInfoFormat";
-import { ExpressionContent, TextContent } from "@arcgis/core/popup/content";
+import { ExpressionContent } from "@arcgis/core/popup/content";
 import { years, fieldInfos, dColor, rColor, oColor } from "./config";
 ////////////////////////////////////////////////////
 //
@@ -31,8 +31,256 @@ export const statePopupTemplate = () => {
         title: `${fieldInfos.title.state}`,
         fieldInfos: createFieldInfos(fieldNames),
         content: [
-            new TextContent({
-                text: "Lydia"
+            new ExpressionContent({
+                expressionInfo: {
+                    expression: `
+            Expects($feature, "*");
+
+            var result = "";
+
+            var dMargins = [];
+            var rMargins = [];
+
+            var years = [${years}];
+
+            var rColorHex = "${rColor.toHex()}";
+            var dColorHex = "${dColor.toHex()}";
+            var oColorHex = "${oColor.toHex()}";
+
+            for (var i in years){
+              var y = Text(years[i]);
+
+              var rVotes = $feature[\`SUM_rep_\${y}\`];
+              var dVotes = $feature[\`SUM_dem_\${y}\`];
+              var oVotes = $feature[\`SUM_oth_\${y}\`];
+
+              var allVotes = Reverse(Sort([rVotes, dVotes, oVotes]));
+              var sumVotes = Sum(allVotes);
+
+              var winner = Decode(Max(allVotes),
+                rVotes, "r",
+                dVotes, "d",
+                "o"
+              );
+
+              var marginTotal = allVotes[0] - allVotes[1];
+              var marginPercent = Round(((allVotes[0] / sumVotes) - (allVotes[1] / sumVotes)) * 100, 1);
+
+              if(winner == "r"){
+                Push(rMargins, marginPercent);
+              }
+              if(winner == "d"){
+                Push(dMargins, marginPercent);
+              }
+            }
+
+            var yCount = Count(years);
+            var strongThreshold = yCount * 0.75;
+            var contestedThreshold = yCount * 0.5;
+
+            var dCount = Count(dMargins);
+            var dAvg = Sum(dMargins) / yCount;
+
+            var rCount = Count(rMargins);
+            var rAvg = Sum(rMargins) / yCount;
+
+
+            var trend = When(
+              (dCount > strongThreshold) && (dAvg > 5), \` shown <b><span style='color:\${dColorHex}'>strong Democrat</span></b> support\`,
+              (dCount > strongThreshold) && (dAvg <= 5), \`<b><span style='color:\${dColorHex}'>leaned Democrat</span></b>\`,
+              (dCount > contestedThreshold), \`been <b>contested</b>, but tends to <b><span style='color:\${dColorHex}'>lean Democrat</span></b>\`,
+
+              (rCount > strongThreshold) && (rAvg > 5), \` shown <b><span style='color:\${rColorHex}'>strong Republican</span></b> support\`,
+              (rCount > strongThreshold) && (rAvg <= 5), \`<b><span style='color:\${rColorHex}'>leaned Republican</span></b>\`,
+              (rCount > contestedThreshold), \`been <b>contested</b>, but tend to <b><span style='color:\${rColorHex}'> lean Republican</span></b>\`,
+              "contested"
+            );
+
+            result = \`\${$feature.state} voting totals in the last \${yCount} U.S. presidential elections have \${trend}.\`;
+
+            return {
+              type: "text",
+              text: result
+            };
+          `
+                }
+            }),
+            new ExpressionContent({
+                expressionInfo: {
+                    expression: `
+            Expects($feature, "*");
+            var years = [${years}];
+            var candidates = {
+              "2000": {
+                republican: {
+                  candidate: "Bush",
+                  electoralVotes: 271
+                },
+                democrat: {
+                  candidate: "Gore",
+                  electoralVotes: 266
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2004": {
+                republican: {
+                  candidate: "Bush",
+                  electoralVotes: 286
+                },
+                democrat: {
+                  candidate: "Kerry",
+                  electoralVotes: 251
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2008": {
+                republican: {
+                  candidate: "McCain",
+                  electoralVotes: 173
+                },
+                democrat: {
+                  candidate: "Obama",
+                  electoralVotes: 365
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2012": {
+                republican: {
+                  candidate: "Romney",
+                  electoralVotes: 206
+                },
+                democrat: {
+                  candidate: "Obama",
+                  electoralVotes: 332
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2016": {
+                republican: {
+                  candidate: "Trump",
+                  electoralVotes: 304
+                },
+                democrat: {
+                  candidate: "Clinton",
+                  electoralVotes: 227
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2020": {
+                republican: {
+                  candidate: "Trump",
+                  electoralVotes: 232
+                },
+                democrat: {
+                  candidate: "Biden",
+                  electoralVotes: 306
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              }
+            };
+
+
+            var table = "<table class='esri-widget popup'>";
+            table += "<tr class='head'><td>Year</td><td>Republican</td><td>Votes</td><td>%</td><td>Democrat</td><td>Votes</td><td>%</td></tr>";
+
+            // var results = {};
+
+            for (var i in years){
+              var y = Text(years[i]);
+
+              var results = {
+                r: {
+                  name: candidates[y].republican.candidate,
+                  votes: $feature[\`SUM_rep_\${y}\`],
+                  weight: "normal",
+                  class: "none",
+                  margin: "-"
+                },
+                d: {
+                  name: candidates[y].democrat.candidate,
+                  votes: $feature[\`SUM_dem_\${y}\`],
+                  weight: "normal",
+                  class: "none",
+                  margin: "-"
+                },
+                o: {
+                  name: candidates[y].other.candidate,
+                  votes: $feature[\`SUM_oth_\${y}\`],
+                  weight: "normal",
+                  class: "none",
+                  margin: "-"
+                }
+              };
+
+              var allVotes = Reverse(Sort([results.r.votes, results.d.votes, results.o.votes]));
+              var sumVotes = Sum(allVotes);
+              var winner = Decode(Max(allVotes),
+                results.r.votes, "r",
+                results.d.votes, "d",
+                "o"
+              );
+
+              results[winner].weight = "bolder";
+
+              if(winner == "r"){
+                results.r.class = "rep";
+              }
+              if(winner == "d"){
+                results.d.class = "dem";
+              }
+
+
+              var marginTotal = Text(allVotes[0] - allVotes[1], "#,###");
+              var marginPercent = Text((allVotes[0] / sumVotes) - (allVotes[1] / sumVotes), "+#.0%;-#.0%");
+
+              results[winner].margin = marginPercent;
+
+              var tr = "";
+              tr += \`<tr><td>\${y}</td>\`;
+
+              var rColor = "rgba(${rColor.toRgba()})";
+              var dColor = "rgba(${dColor.toRgba()})";
+
+              tr += \`<td class='\${results.r.class}'><span style='color:\${rColor}; font-weight: \${results.r.weight}'>\${results.r.name}</span></td>\`;
+              tr += \`<td class='\${results.r.class}'><span style='color:\${rColor}; font-weight: \${results.r.weight}'>\${Text(results.r.votes, "#,###")}</span></td>\`;
+              tr += \`<td class='\${results.r.class}'><span style='color:\${rColor}; font-weight: \${results.r.weight}'>\${results.r.margin}</span></td>\`;
+
+              tr += \`<td class='\${results.d.class}'><span style='color:\${dColor}; font-weight: \${results.d.weight}'>\${results.d.name}</span></td>\`;
+              tr += \`<td class='\${results.d.class}'><span style='color:\${dColor}; font-weight: \${results.d.weight}'>\${Text(results.d.votes, "#,###")}</span></td>\`;
+              tr += \`<td class='\${results.d.class}'><span style='color:\${dColor}; font-weight: \${results.d.weight}'>\${results.d.margin}</span></td>\`;
+
+              tr += "</tr>";
+
+              table += tr;
+
+            }
+
+            table += "</table>";
+
+            return {
+              type: "text",
+              text: table
+            }
+          `
+                }
             }),
             new ExpressionContent({
                 expressionInfo: {
@@ -220,13 +468,13 @@ export const statePopupTemplate = () => {
 
             Insert(mediaInfos, 0, {
               type: "columnchart",
-              title: "Margin of victory (% points)",
+              title: "Margin of victory trend (% points)",
               value: { fields: fieldsMargin, colors }
             });
 
             Insert(mediaInfos, 1, {
               type: "columnchart",
-              title: "Margin of victory (total)",
+              title: "Margin of victory trend (total votes)",
               value: { fields: fieldsTotal, colors }
             });
 
@@ -235,183 +483,6 @@ export const statePopupTemplate = () => {
               attributes,
               mediaInfos
             };
-          `
-                }
-            }),
-            new ExpressionContent({
-                expressionInfo: {
-                    expression: `
-            Expects($feature, "*");
-            var years = [${years}];
-            var candidates = {
-              "2000": {
-                republican: {
-                  candidate: "Bush",
-                  electoralVotes: 271
-                },
-                democrat: {
-                  candidate: "Gore",
-                  electoralVotes: 266
-                },
-                other: {
-                  candidate: "Other",
-                  electoralVotes: 0
-                }
-              },
-              "2004": {
-                republican: {
-                  candidate: "Bush",
-                  electoralVotes: 286
-                },
-                democrat: {
-                  candidate: "Kerry",
-                  electoralVotes: 251
-                },
-                other: {
-                  candidate: "Other",
-                  electoralVotes: 0
-                }
-              },
-              "2008": {
-                republican: {
-                  candidate: "McCain",
-                  electoralVotes: 173
-                },
-                democrat: {
-                  candidate: "Obama",
-                  electoralVotes: 365
-                },
-                other: {
-                  candidate: "Other",
-                  electoralVotes: 0
-                }
-              },
-              "2012": {
-                republican: {
-                  candidate: "Romney",
-                  electoralVotes: 206
-                },
-                democrat: {
-                  candidate: "Obama",
-                  electoralVotes: 332
-                },
-                other: {
-                  candidate: "Other",
-                  electoralVotes: 0
-                }
-              },
-              "2016": {
-                republican: {
-                  candidate: "Trump",
-                  electoralVotes: 304
-                },
-                democrat: {
-                  candidate: "Clinton",
-                  electoralVotes: 227
-                },
-                other: {
-                  candidate: "Other",
-                  electoralVotes: 0
-                }
-              },
-              "2020": {
-                republican: {
-                  candidate: "Trump",
-                  electoralVotes: 232
-                },
-                democrat: {
-                  candidate: "Biden",
-                  electoralVotes: 306
-                },
-                other: {
-                  candidate: "Other",
-                  electoralVotes: 0
-                }
-              }
-            };
-
-
-            var table = "<table class='esri-widget popup'>";
-            table += "<tr class='head'><td>Year</td><td>Republican</td><td>Votes</td><td>%</td><td>Democrat</td><td>Votes</td><td>%</td></tr>";
-
-            // var results = {};
-
-            for (var i in years){
-              var y = Text(years[i]);
-
-              var results = {
-                r: {
-                  name: candidates[y].republican.candidate,
-                  votes: $feature[\`SUM_rep_\${y}\`],
-                  weight: "normal",
-                  class: "none",
-                  margin: "-"
-                },
-                d: {
-                  name: candidates[y].democrat.candidate,
-                  votes: $feature[\`SUM_dem_\${y}\`],
-                  weight: "normal",
-                  class: "none",
-                  margin: "-"
-                },
-                o: {
-                  name: candidates[y].other.candidate,
-                  votes: $feature[\`SUM_oth_\${y}\`],
-                  weight: "normal",
-                  class: "none",
-                  margin: "-"
-                }
-              };
-
-              var allVotes = Reverse(Sort([results.r.votes, results.d.votes, results.o.votes]));
-              var sumVotes = Sum(allVotes);
-              var winner = Decode(Max(allVotes),
-                results.r.votes, "r",
-                results.d.votes, "d",
-                "o"
-              );
-
-              results[winner].weight = "bolder";
-
-              if(winner == "r"){
-                results.r.class = "rep";
-              }
-              if(winner == "d"){
-                results.d.class = "dem";
-              }
-
-
-              var marginTotal = Text(allVotes[0] - allVotes[1], "#,###");
-              var marginPercent = Text((allVotes[0] / sumVotes) - (allVotes[1] / sumVotes), "+#.0%;-#.0%");
-
-              results[winner].margin = marginPercent;
-
-              var tr = "";
-              tr += \`<tr><td>\${y}</td>\`;
-
-              var rColor = "rgba(${rColor.toRgba()})";
-              var dColor = "rgba(${dColor.toRgba()})";
-
-              tr += \`<td class='\${results.r.class}'><span style='color:\${rColor}; font-weight: \${results.r.weight}'>\${results.r.name}</span></td>\`;
-              tr += \`<td class='\${results.r.class}'><span style='color:\${rColor}; font-weight: \${results.r.weight}'>\${Text(results.r.votes, "#,###")}</span></td>\`;
-              tr += \`<td class='\${results.r.class}'><span style='color:\${rColor}; font-weight: \${results.r.weight}'>\${results.r.margin}</span></td>\`;
-
-              tr += \`<td class='\${results.d.class}'><span style='color:\${dColor}; font-weight: \${results.d.weight}'>\${results.d.name}</span></td>\`;
-              tr += \`<td class='\${results.d.class}'><span style='color:\${dColor}; font-weight: \${results.d.weight}'>\${Text(results.d.votes, "#,###")}</span></td>\`;
-              tr += \`<td class='\${results.d.class}'><span style='color:\${dColor}; font-weight: \${results.d.weight}'>\${results.d.margin}</span></td>\`;
-
-              tr += "</tr>";
-
-              table += tr;
-
-            }
-
-            table += "</table>";
-
-            return {
-              type: "text",
-              text: table
-            }
           `
                 }
             })
