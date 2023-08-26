@@ -10,7 +10,6 @@ const layer = new FeatureLayer({
     renderer: createRenderer(),
     popupTemplate: statePopupTemplate()
 });
-console.log(JSON.stringify(layer.renderer.symbol));
 const map = new ArcGISMap({
     basemap: {
         portalItem: {
@@ -19,13 +18,10 @@ const map = new ArcGISMap({
     },
     layers: [layer]
 });
-const view = new MapView({
+new MapView({
     map: map,
     container: "viewDiv",
     center: [-118.244, 34.052],
     zoom: 3
-});
-view.when(() => {
-    console.log("Map is loaded");
 });
 //# sourceMappingURL=main.js.map
