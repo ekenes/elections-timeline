@@ -3,12 +3,16 @@ import MapView from "@arcgis/core/views/MapView.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { createRenderer } from "./rendererUtils";
 import { statePopupTemplate } from "./popupUtils";
-const layer = new FeatureLayer({
+import { scaleThreshold, statesLayerPortalItem } from "./config";
+const stateLayer = new FeatureLayer({
     portalItem: {
-        id: "f2825b56dfc14bb892604637dab45104"
+        id: statesLayerPortalItem
     },
-    renderer: createRenderer(),
-    popupTemplate: statePopupTemplate()
+    renderer: createRenderer({
+        isState: true
+    }),
+    popupTemplate: statePopupTemplate(),
+    maxScale: scaleThreshold
 });
 const map = new ArcGISMap({
     basemap: {
@@ -16,7 +20,7 @@ const map = new ArcGISMap({
             id: "fbfb62f3599f41e5a77845f863e2872f"
         }
     },
-    layers: [layer]
+    layers: [stateLayer]
 });
 new MapView({
     map: map,

@@ -4,14 +4,28 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { createRenderer } from "./rendererUtils";
 import { SimpleRenderer } from "@arcgis/core/renderers";
 import { statePopupTemplate } from "./popupUtils";
+import { countiesLayerPortalItem, scaleThreshold, statesLayerPortalItem } from "./config";
 
-const layer = new FeatureLayer({
+const stateLayer = new FeatureLayer({
   portalItem: {
-    id: "f2825b56dfc14bb892604637dab45104"
+    id: statesLayerPortalItem
   },
-  renderer: createRenderer(),
-  popupTemplate: statePopupTemplate()
+  renderer: createRenderer({
+    isState: true
+  }),
+  popupTemplate: statePopupTemplate(),
+  maxScale: scaleThreshold
 });
+
+const countyLayer = new FeatureLayer({
+  portalItem: {
+    id: countiesLayerPortalItem
+  },
+  renderer: createRenderer({
+    isState: false
+  }),
+  minScale: scaleThreshold
+})
 
 const map = new ArcGISMap({
   basemap: {
@@ -19,7 +33,7 @@ const map = new ArcGISMap({
       id: "fbfb62f3599f41e5a77845f863e2872f"
     }
   },
-  layers: [ layer ]
+  layers: [ stateLayer, countyLayer ]
 });
 
 new MapView({

@@ -126,6 +126,8 @@ export const oColorCIM = oColor.toJSON();
 
 // state results layer
 
+export const stateFieldPrefix = "SUM_";
+
 export const stateResultsSizeStops = [
   { value: 0, size: 8 },
   { value: 100000, size: 10 },

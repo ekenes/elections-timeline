@@ -2,14 +2,25 @@ import { SimpleRenderer } from "@arcgis/core/renderers";
 import CIMSymbol from "@arcgis/core/symbols/CIMSymbol";
 import { createSquareSymbolLayer } from "./symbolUtils";
 import { createColorPrimitiveOverride, createOffsetXPrimitiveOverride, createSizePrimitiveOverride } from "./expressionUtils";
+import { stateFieldPrefix } from "./config";
 
-export function createRenderer (): SimpleRenderer {
+
+interface CreateRendererParams {
+  isState: Boolean;
+}
+
+export function createRenderer (params: CreateRendererParams): SimpleRenderer {
+  const { isState } = params;
   return new SimpleRenderer({
-    symbol: createSymbol()
+    symbol: createSymbol({ isState })
   })
 }
 
-function createSymbol () {
+function createSymbol (params: CreateRendererParams) {
+  const { isState } = params;
+
+  const fieldPrefix = isState ? stateFieldPrefix : "";
+
   return new CIMSymbol({
     data: {
       type: `CIMSymbolReference`,
@@ -61,23 +72,28 @@ function createSymbol () {
         // }),
         createColorPrimitiveOverride({
           primitiveName: "election-2004",
-          year: 2004
+          year: 2004,
+          fieldPrefix
         }),
         createColorPrimitiveOverride({
           primitiveName: "election-2008",
-          year: 2008
+          year: 2008,
+          fieldPrefix
         }),
         createColorPrimitiveOverride({
           primitiveName: "election-2012",
-          year: 2012
+          year: 2012,
+          fieldPrefix
         }),
         createColorPrimitiveOverride({
           primitiveName: "election-2016",
-          year: 2016
+          year: 2016,
+          fieldPrefix
         }),
         createColorPrimitiveOverride({
           primitiveName: "election-2020",
-          year: 2020
+          year: 2020,
+          fieldPrefix
         }),
 
         // createSizePrimitiveOverride({
@@ -86,23 +102,28 @@ function createSymbol () {
         // }),
         createSizePrimitiveOverride({
           primitiveName: "election-2004",
-          year: 2004
+          year: 2004,
+          fieldPrefix
         }),
         createSizePrimitiveOverride({
           primitiveName: "election-2008",
-          year: 2008
+          year: 2008,
+          fieldPrefix
         }),
         createSizePrimitiveOverride({
           primitiveName: "election-2012",
-          year: 2012
+          year: 2012,
+          fieldPrefix
         }),
         createSizePrimitiveOverride({
           primitiveName: "election-2016",
-          year: 2016
+          year: 2016,
+          fieldPrefix
         }),
         createSizePrimitiveOverride({
           primitiveName: "election-2020",
-          year: 2020
+          year: 2020,
+          fieldPrefix
         }),
 
         // createOffsetXPrimitiveOverride({
@@ -111,23 +132,28 @@ function createSymbol () {
         // }),
         createOffsetXPrimitiveOverride({
           primitiveName: "election-2004",
-          year: 2004
+          year: 2004,
+          fieldPrefix
         }),
         createOffsetXPrimitiveOverride({
           primitiveName: "election-2008",
-          year: 2008
+          year: 2008,
+          fieldPrefix
         }),
         createOffsetXPrimitiveOverride({
           primitiveName: "election-2012",
-          year: 2012
+          year: 2012,
+          fieldPrefix
         }),
         createOffsetXPrimitiveOverride({
           primitiveName: "election-2016",
-          year: 2016
+          year: 2016,
+          fieldPrefix
         }),
         createOffsetXPrimitiveOverride({
           primitiveName: "election-2020",
-          year: 2020
+          year: 2020,
+          fieldPrefix
         })
       ]
     }

@@ -1,6 +1,7 @@
 import { dColorCIM, oColorCIM, rColorCIM, stateChangeSizeStops, stateReferenceScale, years } from "./config";
 export function createColorPrimitiveOverride(params) {
-    const { year, primitiveName } = params;
+    const { year, primitiveName, isState } = params;
+    const fieldPrefix = isState ? "SUM_" : "";
     return {
         type: `CIMPrimitiveOverride`,
         primitiveName,
@@ -13,9 +14,9 @@ export function createColorPrimitiveOverride(params) {
         var dColor = ${JSON.stringify(dColorCIM)};
         var oColor = ${JSON.stringify(oColorCIM)};
 
-        var demVotes = $feature.SUM_dem_${year};
-        var repVotes = $feature.SUM_rep_${year};
-        var othVotes = $feature.SUM_oth_${year};
+        var demVotes = $feature.${fieldPrefix}dem_${year};
+        var repVotes = $feature.${fieldPrefix}rep_${year};
+        var othVotes = $feature.${fieldPrefix}oth_${year};
 
         var allVotes = [demVotes, repVotes, othVotes];
 
@@ -62,7 +63,8 @@ function interpolateBetweenStops(firstStop, nextStop) {
     return sizeRange / dataRange;
 }
 export function createSizePrimitiveOverride(params) {
-    const { year, primitiveName } = params;
+    const { year, primitiveName, isState } = params;
+    const fieldPrefix = isState ? "SUM_" : "";
     return {
         type: `CIMPrimitiveOverride`,
         primitiveName,
@@ -71,9 +73,9 @@ export function createSizePrimitiveOverride(params) {
             type: `CIMExpressionInfo`,
             title: `Margin of Victory`,
             expression: `
-        var demVotes = $feature.SUM_dem_${year};
-        var repVotes = $feature.SUM_rep_${year};
-        var othVotes = $feature.SUM_oth_${year};
+        var demVotes = $feature.${fieldPrefix}dem_${year};
+        var repVotes = $feature.${fieldPrefix}rep_${year};
+        var othVotes = $feature.${fieldPrefix}oth_${year};
 
         var allVotes = Reverse(Sort([demVotes, repVotes, othVotes]));
 
@@ -88,7 +90,8 @@ export function createSizePrimitiveOverride(params) {
     };
 }
 export function createOffsetXPrimitiveOverride(params) {
-    const { year, primitiveName } = params;
+    const { year, primitiveName, isState } = params;
+    const fieldPrefix = isState ? "SUM_" : "";
     return {
         type: `CIMPrimitiveOverride`,
         primitiveName,
@@ -129,9 +132,9 @@ export function createOffsetXPrimitiveOverride(params) {
         var offsetX = 0;
 
         for (var year = yearStart; year <= yearEnd; year+=interval){
-          var demVotes = $feature[\`SUM_dem_\${year}\`];
-          var repVotes = $feature[\`SUM_rep_\${year}\`];
-          var othVotes = $feature[\`SUM_oth_\${year}\`];
+          var demVotes = $feature[\`${fieldPrefix}dem_\${year}\`];
+          var repVotes = $feature[\`${fieldPrefix}rep_\${year}\`];
+          var othVotes = $feature[\`${fieldPrefix}oth_\${year}\`];
 
           var allVotes = Reverse(Sort([demVotes, repVotes, othVotes]));
 
