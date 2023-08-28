@@ -73,11 +73,11 @@ export const sizeExpressionBaseStates = `
 
 const sizeFactorCounties = `
   var sizeFactor = When(
-    percentStateVotes >= ${countySizeStops[4].value}, ${countySizeStops[4].size},
-    percentStateVotes >= ${countySizeStops[3].value}, ${countySizeStops[3].size} + (${interpolateBetweenStops(countySizeStops[3], countySizeStops[4])} * (percentStateVotes - ${countySizeStops[3].value})),
-    percentStateVotes >= ${countySizeStops[2].value}, ${countySizeStops[2].size} + (${interpolateBetweenStops(countySizeStops[2], countySizeStops[3])} * (percentStateVotes - ${countySizeStops[2].value})),
-    percentStateVotes >= ${countySizeStops[1].value}, ${countySizeStops[1].size} + (${interpolateBetweenStops(countySizeStops[1], countySizeStops[2])} * (percentStateVotes - ${countySizeStops[1].value})),
-    percentStateVotes > ${countySizeStops[0].value}, ${countySizeStops[0].size} + (${interpolateBetweenStops(countySizeStops[0], countySizeStops[1])} * percentStateVotes),
+    value >= ${countySizeStops[4].value}, ${countySizeStops[4].size},
+    value >= ${countySizeStops[3].value}, ${countySizeStops[3].size} + (${interpolateBetweenStops(countySizeStops[3], countySizeStops[4])} * (value - ${countySizeStops[3].value})),
+    value >= ${countySizeStops[2].value}, ${countySizeStops[2].size} + (${interpolateBetweenStops(countySizeStops[2], countySizeStops[3])} * (value - ${countySizeStops[2].value})),
+    value >= ${countySizeStops[1].value}, ${countySizeStops[1].size} + (${interpolateBetweenStops(countySizeStops[1], countySizeStops[2])} * (value - ${countySizeStops[1].value})),
+    value > ${countySizeStops[0].value}, ${countySizeStops[0].size} + (${interpolateBetweenStops(countySizeStops[0], countySizeStops[1])} * value),
     0
   );
 `;
@@ -100,7 +100,7 @@ export const sizeExpressionBaseCounties = `
   ${sizeFactorCounties}
 
   ${scaleFactorCounties}
-  return sizeFactor * scaleFactor;
+  var size = sizeFactor * scaleFactor;
 `;
 
 

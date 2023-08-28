@@ -3,8 +3,8 @@ import PopupTemplate from "@arcgis/core/PopupTemplate";
 import FieldInfo from "@arcgis/core/popup/FieldInfo";
 import FieldInfoFormat from "@arcgis/core/popup/support/FieldInfoFormat";
 
-import { ExpressionContent, TextContent } from "@arcgis/core/popup/content";
-import { years, fieldInfos, dColor, rColor, oColor } from "./config";
+import { ExpressionContent } from "@arcgis/core/popup/content";
+import { years, fieldInfos, dColor, rColor, oColor, stateFieldPrefix } from "./config";
 
 ////////////////////////////////////////////////////
 //
@@ -25,18 +25,24 @@ function createFieldInfos (fieldNames: string[]): FieldInfo[] {
   });
 }
 
+interface PopupTemplateParams {
+  isState: boolean;
+}
 
-export const statePopupTemplate = () => {
+export const statePopupTemplate = (params: PopupTemplateParams) => {
+  const { isState } = params;
+  const fieldPrefix = isState ? stateFieldPrefix : "";
+
   const fieldNames = years.map(year => {
     return [
-      `SUM_rep_${year}`,
-      `SUM_dem_${year}`,
-      `SUM_oth_${year}`,
+      `${fieldPrefix}rep_${year}`,
+      `${fieldPrefix}dem_${year}`,
+      `${fieldPrefix}oth_${year}`,
      ]
   }).flat();
 
   return new PopupTemplate({
-    title: `${fieldInfos.title.state}`,
+    title: `${isState ? fieldInfos.title.state : fieldInfos.title.county}`,
     fieldInfos: createFieldInfos(fieldNames),
     content: [
       new ExpressionContent({
@@ -58,9 +64,9 @@ export const statePopupTemplate = () => {
             for (var i in years){
               var y = Text(years[i]);
 
-              var rVotes = $feature[\`SUM_rep_\${y}\`];
-              var dVotes = $feature[\`SUM_dem_\${y}\`];
-              var oVotes = $feature[\`SUM_oth_\${y}\`];
+              var rVotes = $feature[\`${fieldPrefix}rep_\${y}\`];
+              var dVotes = $feature[\`${fieldPrefix}dem_\${y}\`];
+              var oVotes = $feature[\`${fieldPrefix}oth_\${y}\`];
 
               var allVotes = Reverse(Sort([rVotes, dVotes, oVotes]));
               var sumVotes = Sum(allVotes);
@@ -104,7 +110,9 @@ export const statePopupTemplate = () => {
               "contested"
             );
 
-            result = \`\${$feature.state} voting totals in the last \${yCount} U.S. presidential elections have \${trend}.\`;
+            var geographyName = iif(haskey($feature, "county"), \`\${$feature.county}, \${$feature.state}\`, $feature.state);
+
+            result = \`In the last \${yCount} U.S. presidential elections, \${geographyName} voters have \${trend}.\`;
 
             return {
               type: "text",
@@ -217,21 +225,21 @@ export const statePopupTemplate = () => {
               var results = {
                 r: {
                   name: candidates[y].republican.candidate,
-                  votes: $feature[\`SUM_rep_\${y}\`],
+                  votes: $feature[\`${fieldPrefix}rep_\${y}\`],
                   weight: "normal",
                   class: "none",
                   margin: "-"
                 },
                 d: {
                   name: candidates[y].democrat.candidate,
-                  votes: $feature[\`SUM_dem_\${y}\`],
+                  votes: $feature[\`${fieldPrefix}dem_\${y}\`],
                   weight: "normal",
                   class: "none",
                   margin: "-"
                 },
                 o: {
                   name: candidates[y].other.candidate,
-                  votes: $feature[\`SUM_oth_\${y}\`],
+                  votes: $feature[\`${fieldPrefix}oth_\${y}\`],
                   weight: "normal",
                   class: "none",
                   margin: "-"
@@ -403,21 +411,21 @@ export const statePopupTemplate = () => {
               var results = {
                 r: {
                   name: candidates[y].republican.candidate,
-                  votes: $feature[\`SUM_rep_\${y}\`],
+                  votes: $feature[\`${fieldPrefix}rep_\${y}\`],
                   margin: null,
                   color: rColor,
                   hexColor: rColorHex
                 },
                 d: {
                   name: candidates[y].democrat.candidate,
-                  votes: $feature[\`SUM_dem_\${y}\`],
+                  votes: $feature[\`${fieldPrefix}dem_\${y}\`],
                   margin: null,
                   color: dColor,
                   hexColor: dColorHex
                 },
                 o: {
                   name: candidates[y].other.candidate,
-                  votes: $feature[\`SUM_oth_\${y}\`],
+                  votes: $feature[\`${fieldPrefix}oth_\${y}\`],
                   margin: null,
                   color: oColor,
                   hexColor: oColorHex
@@ -458,9 +466,17 @@ export const statePopupTemplate = () => {
 
               var evFieldName = \`ev_\${y}\`;
 
+              var title = "";
+
+              if(haskey($feature, "county")){
+                title = \`<span style='color:\${winnerInfo.hexColor}'><b>\${winnerInfo.name}</b></span> won \${$feature.county}, \${$feature.state} in \${y}\`;
+              } else {
+                title = \`<span style='color:\${winnerInfo.hexColor}'><b>\${winnerInfo.name}</b></span> won \${$feature.state}'s \${$feature[evFieldName]} electoral votes in \${y}\`;
+              }
+
               var resultsChart = {
                 type: "barchart",
-                title: \`<span style='color:\${winnerInfo.hexColor}'><b>\${winnerInfo.name}</b></span> won \${$feature.state}'s \${$feature[evFieldName]} electoral votes in \${y}\`,
+                title,
                 value: {
                   fields: [
                     rCandidateName,

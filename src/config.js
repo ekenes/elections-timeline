@@ -112,6 +112,7 @@ export const oColorCIM = oColor.toJSON();
 // size stops
 //////////////
 // state results layer
+export const stateFieldPrefix = "SUM_";
 export const stateResultsSizeStops = [
     { value: 0, size: 8 },
     { value: 100000, size: 10 },
@@ -130,10 +131,10 @@ export const stateChangeSizeStops = [
 // county layers
 // size is votes as a % of total state votes
 export const countySizeStops = [
-    { value: 0, size: 6 },
-    { value: 0.1, size: 12 },
-    { value: 1, size: 24 },
-    { value: 2, size: 32 },
-    { value: 10, size: 50 }
+    { value: 0, size: 3 },
+    { value: 1000, size: 6 },
+    { value: 5000, size: 10 },
+    { value: 15000, size: 14 },
+    { value: 30000, size: 20 }
 ];
 //# sourceMappingURL=config.js.map

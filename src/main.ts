@@ -2,7 +2,6 @@ import ArcGISMap from "@arcgis/core/Map.js";
 import MapView from "@arcgis/core/views/MapView.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { createRenderer } from "./rendererUtils";
-import { SimpleRenderer } from "@arcgis/core/renderers";
 import { statePopupTemplate } from "./popupUtils";
 import { countiesLayerPortalItem, scaleThreshold, statesLayerPortalItem } from "./config";
 
@@ -13,8 +12,11 @@ const stateLayer = new FeatureLayer({
   renderer: createRenderer({
     isState: true
   }),
-  popupTemplate: statePopupTemplate(),
-  maxScale: scaleThreshold
+  popupTemplate: statePopupTemplate({
+    isState: true
+  }),
+  maxScale: scaleThreshold,
+  opacity: 1
 });
 
 const countyLayer = new FeatureLayer({
@@ -24,8 +26,12 @@ const countyLayer = new FeatureLayer({
   renderer: createRenderer({
     isState: false
   }),
-  minScale: scaleThreshold
-})
+  popupTemplate: statePopupTemplate({
+    isState: false
+  }),
+  minScale: scaleThreshold,
+  opacity: 1
+});
 
 const map = new ArcGISMap({
   basemap: {

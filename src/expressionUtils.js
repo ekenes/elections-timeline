@@ -1,7 +1,6 @@
-import { dColorCIM, oColorCIM, rColorCIM, stateChangeSizeStops, stateReferenceScale, years } from "./config";
+import { countySizeStops, dColorCIM, oColorCIM, rColorCIM, referenceScale, stateChangeSizeStops, stateFieldPrefix, stateReferenceScale, years } from "./config";
 export function createColorPrimitiveOverride(params) {
-    const { year, primitiveName, isState } = params;
-    const fieldPrefix = isState ? "SUM_" : "";
+    const { year, primitiveName, fieldPrefix } = params;
     return {
         type: `CIMPrimitiveOverride`,
         primitiveName,
@@ -31,7 +30,7 @@ export function createColorPrimitiveOverride(params) {
     };
 }
 // states change layer renderer expressions
-const scaleFactorTotal = `
+const scaleFactorStates = `
   var scaleFactorBase = ( ${stateReferenceScale} / $view.scale );
   var scaleFactor = When(
     scaleFactorBase >= 1, 1,  // 1
@@ -41,7 +40,7 @@ const scaleFactorTotal = `
     scaleFactorBase * 1  // 0.1875
   );
 `;
-const sizeFactorChangeTotal = `
+const sizeFactorStates = `
   var sizeFactor = When(
     value >= ${stateChangeSizeStops[4].value}, ${stateChangeSizeStops[4].size},
     value >= ${stateChangeSizeStops[3].value}, ${stateChangeSizeStops[3].size} + (${interpolateBetweenStops(stateChangeSizeStops[3], stateChangeSizeStops[4])} * (value - ${stateChangeSizeStops[3].value})),
@@ -51,10 +50,40 @@ const sizeFactorChangeTotal = `
     0
   );
 `;
-export const sizeTotalChangeExpressionBase = `
-  ${sizeFactorChangeTotal}
+export const sizeExpressionBaseStates = `
+  ${sizeFactorStates}
 
-  ${scaleFactorTotal}
+  ${scaleFactorStates}
+  var size = sizeFactor * scaleFactor;
+`;
+// counties layer expressions
+const sizeFactorCounties = `
+  var sizeFactor = When(
+    value >= ${countySizeStops[4].value}, ${countySizeStops[4].size},
+    value >= ${countySizeStops[3].value}, ${countySizeStops[3].size} + (${interpolateBetweenStops(countySizeStops[3], countySizeStops[4])} * (value - ${countySizeStops[3].value})),
+    value >= ${countySizeStops[2].value}, ${countySizeStops[2].size} + (${interpolateBetweenStops(countySizeStops[2], countySizeStops[3])} * (value - ${countySizeStops[2].value})),
+    value >= ${countySizeStops[1].value}, ${countySizeStops[1].size} + (${interpolateBetweenStops(countySizeStops[1], countySizeStops[2])} * (value - ${countySizeStops[1].value})),
+    value > ${countySizeStops[0].value}, ${countySizeStops[0].size} + (${interpolateBetweenStops(countySizeStops[0], countySizeStops[1])} * value),
+    0
+  );
+`;
+const scaleFactorCounties = `
+  var scaleFactorBase = Round( ${referenceScale} / $view.scale, 1 );
+  var scaleFactor = When(
+    scaleFactorBase >= 8, scaleFactorBase / 6,
+    scaleFactorBase >= 4, scaleFactorBase / 3,  // 1
+    scaleFactorBase >= 2, scaleFactorBase / 1.7,
+    scaleFactorBase >= 1, scaleFactorBase,  // 1
+    scaleFactorBase >= 0.5, scaleFactorBase * 1.2,  // 0.6
+    scaleFactorBase >= 0.25, scaleFactorBase * 1.2,  // 0.45
+    scaleFactorBase >= 0.125, scaleFactorBase * 2.5,  // 0.3125
+    scaleFactorBase * 3  // 0.1875
+  );
+`;
+export const sizeExpressionBaseCounties = `
+  ${sizeFactorCounties}
+
+  ${scaleFactorCounties}
   var size = sizeFactor * scaleFactor;
 `;
 function interpolateBetweenStops(firstStop, nextStop) {
@@ -63,8 +92,7 @@ function interpolateBetweenStops(firstStop, nextStop) {
     return sizeRange / dataRange;
 }
 export function createSizePrimitiveOverride(params) {
-    const { year, primitiveName, isState } = params;
-    const fieldPrefix = isState ? "SUM_" : "";
+    const { year, primitiveName, fieldPrefix } = params;
     return {
         type: `CIMPrimitiveOverride`,
         primitiveName,
@@ -81,7 +109,7 @@ export function createSizePrimitiveOverride(params) {
 
         var value = allVotes[0] - allVotes[1];
 
-        ${sizeTotalChangeExpressionBase}
+        ${fieldPrefix === stateFieldPrefix ? sizeExpressionBaseStates : sizeExpressionBaseCounties}
 
         return size;
       `,
@@ -90,8 +118,7 @@ export function createSizePrimitiveOverride(params) {
     };
 }
 export function createOffsetXPrimitiveOverride(params) {
-    const { year, primitiveName, isState } = params;
-    const fieldPrefix = isState ? "SUM_" : "";
+    const { year, primitiveName, fieldPrefix } = params;
     return {
         type: `CIMPrimitiveOverride`,
         primitiveName,
@@ -140,7 +167,7 @@ export function createOffsetXPrimitiveOverride(params) {
 
           var value = allVotes[0] - allVotes[1];
 
-          ${sizeTotalChangeExpressionBase}
+          ${fieldPrefix === stateFieldPrefix ? sizeExpressionBaseStates : sizeExpressionBaseCounties}
 
           var factor = iif(
             (year == yearStart) || (year == yearEnd)
