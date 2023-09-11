@@ -1,1 +1,0 @@
-import{w as e,aG as f,aH as i}from"./index-a1a1303e.js";import{m}from"./query-0fb2e4ab.js";async function d(a,r,t){const n=await u(a,r,t);return e.fromJSON(n)}async function u(a,r,t){const n=f(a),s={...t},o=i.from(r),{data:c}=await m(n,o,o.sourceSpatialReference,s);return c}export{u as a,d as s};

@@ -33,11 +33,11 @@ export function createColorPrimitiveOverride(params) {
 const scaleFactorStates = `
   var scaleFactorBase = ( ${stateReferenceScale} / $view.scale );
   var scaleFactor = When(
-    scaleFactorBase >= 1, 1,  // 1
-    scaleFactorBase >= 0.5, scaleFactorBase * 1,  // 0.6
-    scaleFactorBase >= 0.25, scaleFactorBase * 1,  // 0.45
-    scaleFactorBase >= 0.125, scaleFactorBase * 1,  // 0.3125
-    scaleFactorBase * 1  // 0.1875
+    scaleFactorBase >= 1, 1,
+    scaleFactorBase >= 0.5, scaleFactorBase * 0.6,
+    scaleFactorBase >= 0.25, scaleFactorBase * 0.45,
+    scaleFactorBase >= 0.125, scaleFactorBase * 0.3125,
+    scaleFactorBase * 0.1875
   );
 `;
 const sizeFactorStates = `
