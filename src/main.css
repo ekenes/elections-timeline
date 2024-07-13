@@ -7,6 +7,14 @@ body,
   width: 100%;
 }
 
+#viewDiv .esri-popup__main-container {
+  width: 500px;
+}
+
+calcite-shell-panel {
+  --calcite-shell-panel-width: 500px;
+}
+
 #results {
   padding: 10px;
   background-color: white;
@@ -19,13 +27,13 @@ body,
 }
 
 
-#current-year{
+#current-year {
   text-align: center;
   font-size: 18pt;
 }
 
 #dem-results {
-  color:  rgba(60, 108, 204,1);
+  color: rgba(60, 108, 204, 1);
   display: flex;
   justify-content: space-evenly;
 }
@@ -59,22 +67,47 @@ table.popup tr.head {
 }
 
 .dem {
-  background-color:rgba(60, 108, 204,0.08);
+  background-color: rgba(60, 108, 204, 0.08);
 }
+
 .rep {
-  background-color:rgba(220, 75, 0, 0.08);
+  background-color: rgba(220, 75, 0, 0.08);
 }
+
 .oth {
-  background-color:rgba(224, 206, 0, 0.08);
+  background-color: rgba(224, 206, 0, 0.08);
 }
 
 
 .table-container {
-  width:100%;
-  height:100%;
+  width: 100%;
+  height: 100%;
   text-align: center;
 }
 
 table {
   margin: 0 auto;
+}
+
+.custom-content {
+  display: flex;
+  flex-direction: column;
+  max-width: 75vw;
+  width: 25rem;
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.custom-content calcite-button {
+  margin: 1rem auto 0;
+}
+
+.custom-content calcite-chip {
+  margin: 2rem auto;
+}
+
+img{
+  width: 200px;
+  padding-bottom: 5px;
+  align-self: center;
 }

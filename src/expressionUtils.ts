@@ -4,6 +4,7 @@ interface ColorPrimitiveOverrideParams {
   primitiveName: __esri.PrimitiveOverride["primitiveName"];
   year: validYears;
   fieldPrefix: string;
+  level?: "state" | "county" | "country";
 }
 
 export function createColorPrimitiveOverride(params: ColorPrimitiveOverrideParams): __esri.PrimitiveOverride {

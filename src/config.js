@@ -1,4 +1,6 @@
 import Color from "@arcgis/core/Color";
+import Graphic from "@arcgis/core/Graphic";
+import Point from "@arcgis/core/geometry/Point";
 export const basemapPortalItem = "fbfb62f3599f41e5a77845f863e2872f";
 export const statesLayerPortalItem = "f2825b56dfc14bb892604637dab45104";
 export const countiesLayerPortalItem = "fe9e032e4a854c74890750214a3edd8b";
@@ -7,6 +9,48 @@ export const referenceScale = 2311162;
 export const scaleThreshold = 9244600;
 export const stateReferenceScale = 18489200;
 export const years = [2004, 2008, 2012, 2016, 2020];
+export const startYear = years[0];
+export const endYear = years[years.length - 1];
+export const usaGraphic = new Graphic({
+    geometry: new Point({
+        longitude: -98.5795,
+        latitude: 39.8283
+    }),
+    attributes: {
+        ObjectID: 1776,
+        state: `U.S. Presidential Election Results ${startYear}-${endYear}`,
+        dem_2000: 50999897,
+        rep_2000: 48885097,
+        oth_2000: 3458956,
+        rep_ev_2000: 271,
+        dem_ev_2000: 266,
+        dem_2004: 59028444,
+        rep_2004: 62040610,
+        oth_2004: 2529916,
+        rep_ev_2004: 286,
+        dem_ev_2004: 251,
+        dem_2008: 69498516,
+        rep_2008: 59948323,
+        oth_2008: 2352485,
+        rep_ev_2008: 173,
+        dem_ev_2008: 365,
+        dem_2012: 65915795,
+        rep_2012: 60933504,
+        oth_2012: 2345950,
+        rep_ev_2012: 206,
+        dem_ev_2012: 332,
+        dem_2016: 65853514,
+        rep_2016: 62984828,
+        oth_2016: 750884,
+        rep_ev_2016: 304,
+        dem_ev_2016: 227,
+        dem_2020: 81268856,
+        rep_2020: 74216752,
+        oth_2020: 0,
+        rep_ev_2020: 232,
+        dem_ev_2020: 306
+    }
+});
 export const results = {
     2000: {
         republican: {
@@ -96,7 +140,8 @@ export const results = {
 export let fieldInfos = {
     title: {
         state: `{state}`,
-        county: `{county} County, {state}`
+        county: `{county} County, {state}`,
+        country: `U.S. Presidential Election Results ${startYear}-${endYear}`
     }
 };
 // Renderer config

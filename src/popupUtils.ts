@@ -2,9 +2,19 @@
 import PopupTemplate from "@arcgis/core/PopupTemplate";
 import FieldInfo from "@arcgis/core/popup/FieldInfo";
 import FieldInfoFormat from "@arcgis/core/popup/support/FieldInfoFormat";
+import { convertNumberFormatToIntlOptions, formatNumber } from "@arcgis/core/intl";
 
-import { ExpressionContent } from "@arcgis/core/popup/content";
-import { years, fieldInfos, dColor, rColor, oColor, stateFieldPrefix } from "./config";
+import { CustomContent, ExpressionContent } from "@arcgis/core/popup/content";
+import { years, fieldInfos, dColor, rColor, oColor, stateFieldPrefix, startYear, endYear, results } from "./config";
+
+function numberToText(num: number): string {
+  const numberFormatIntlOptions = convertNumberFormatToIntlOptions({
+    places: 0,
+    digitSeparator: true
+  });
+
+  return formatNumber(num, numberFormatIntlOptions);
+}
 
 ////////////////////////////////////////////////////
 //
@@ -25,13 +35,13 @@ function createFieldInfos (fieldNames: string[]): FieldInfo[] {
   });
 }
 
-interface PopupTemplateParams {
-  isState: boolean;
+export interface PopupTemplateParams {
+  level: "country" | "state" | "county";
 }
 
-export const statePopupTemplate = (params: PopupTemplateParams) => {
-  const { isState } = params;
-  const fieldPrefix = isState ? stateFieldPrefix : "";
+export const createPopupTemplate = (params: PopupTemplateParams) => {
+  const { level } = params;
+  const fieldPrefix = level === "state" ? stateFieldPrefix : "";
 
   const fieldNames = years.map(year => {
     return [
@@ -41,10 +51,225 @@ export const statePopupTemplate = (params: PopupTemplateParams) => {
      ]
   }).flat();
 
-  return new PopupTemplate({
-    title: `${isState ? fieldInfos.title.state : fieldInfos.title.county}`,
-    fieldInfos: createFieldInfos(fieldNames),
-    content: [
+  let content = [];
+
+  if(level === "country"){
+    const instructions = new CustomContent({
+      creator: () => {
+        const container = document.createElement("div");
+        container.id = "instructions";
+        container.innerHTML = `
+          <calcite-block collapsible open heading="How to read this map">
+            <p>
+              This map shows the results of each of the previous 5 U.S. presidential elections from ${startYear} to ${endYear}. Each square represents the election winner for the given area in one year. The most recent election (${endYear}) is represented as the right-most square. Each square's color represents the winner of the election; its size is proportional to the margin of victory for the winner. Smaller squares indicate a closer election. Larger squares indicate a larger margin of victory.
+            </p>
+            <p>
+              Scroll through the symbols below to see examples of various trend patterns in the map.
+            </p>
+            <calcite-carousel label="Great new features">
+              <calcite-carousel-item label="Gradual change">
+                  <div class="custom-content">
+                      <img src="./gradual-d.png" alt="Gradual change" />
+                      <span>
+                        <b>Gradual change</b>. This example from Douglas County, Georgia shows a gradual swing from Republican support to Democrats over the last 5 elections. Voters showed strong support for Bush (R) in 2004. In 2008, the county leaned Democrat, and gradually increased support for Democrats in 2012, 2016, and 2020.
+                      </span>
+                  </div>
+              </calcite-carousel-item>
+              <calcite-carousel-item label="Bowtie">
+                  <div class="custom-content">
+                       <img src="./flip.png" alt="Bowtie" />
+                      <span>
+                        <b>Bowtie</b>. In rare scenarios, some counties underwent a dramatic shift in support from one party to another. Anne Arundel County, Maryland went from strong Republican support in 2004 to strong Democrat support in 2020, creating a bowtie shape in the symbol.
+                      </span>
+                  </div>
+              </calcite-carousel-item>
+              <calcite-carousel-item label="No change">
+                  <div class="custom-content">
+                      <img src="./solid-r.png" alt="No change" />
+                      <span>
+                          <b>No change.</b> The populations of many areas are consistent in their support for one party over another. Shelby County, Alabama is an example of a county that has shown strong Republican support in each of the last 5 elections, posting margins of victory exceeding 40% in each of the previous 5 elections.
+                      </span>
+                  </div>
+              </calcite-carousel-item>
+              <calcite-carousel-item label="Inconsistent">
+                  <div class="custom-content">
+                       <img src="./contested.png" alt="Contested" />
+                      <span>
+                          <b>Contested</b>. A few areas, especially in traditional swing states, have shown inconsistent support for either party over the last 5 elections. For example, Macomb County, Michigan showed strong support for Obama (D) in 2008 and 2012, but otherwise sided with Republicans in other elections.
+                      </span>
+                  </div>
+              </calcite-carousel-item>
+          </calcite-carousel>
+        </calcite-block>
+        `;
+        return container;
+      }
+    });
+
+    content.push(instructions);
+
+    const electoralVoteResults = new CustomContent({
+      creator: (event) => {
+        const { graphic } = event!;
+        const container = document.createElement("div");
+        container.id = "electoral-vote-results";
+
+        let evTable = "<table class='esri-widget popup'>";
+        evTable += "<tr class='head'><td>Year</td><td>Republican</td><td>Votes</td><td>+/-</td><td>Democrat</td><td>Votes</td><td>+/-</td></tr>";
+
+        let pvTable = "<table class='esri-widget popup'>";
+        pvTable += "<tr class='head'><td>Year</td><td>Republican</td><td>Votes</td><td>%</td><td>Democrat</td><td>Votes</td><td>%</td></tr>";
+
+        const candidates = JSON.parse(JSON.stringify(results));
+
+        const red = `rgba(${rColor.toRgba()})`;
+        const blue = `rgba(${dColor.toRgba()})`;
+
+        years.forEach((i) => {
+          var y = i.toString();
+
+          const evResults = {
+            r: {
+              name: candidates[y].republican.candidate,
+              votes: candidates[y].republican.electoralVotes,
+              weight: "normal",
+              class: "none",
+              margin: "-"
+            },
+            d: {
+              name: candidates[y].democrat.candidate,
+              votes: candidates[y].democrat.electoralVotes,
+              weight: "normal",
+              class: "none",
+              margin: "-"
+            }
+          };
+
+          const pvResults = {
+            r: {
+              name: candidates[y].republican.candidate,
+              votes: graphic.attributes[`rep_${y}`],
+              weight: "normal",
+              class: "none",
+              margin: "-"
+            },
+            d: {
+              name: candidates[y].democrat.candidate,
+              votes: graphic.attributes[`dem_${y}`],
+              weight: "normal",
+              class: "none",
+              margin: "-"
+            }
+          };
+
+          let allEVvotes = [evResults.r.votes, evResults.d.votes];
+          const maxEVvotes = Math.max(...allEVvotes);
+          const evWinner = allEVvotes.indexOf(maxEVvotes) === 0 ? "r" : "d";
+
+          evResults[evWinner].weight = "bolder";
+
+          if(evWinner === "r"){
+            evResults.r.class = "rep";
+          }
+          if(evWinner === "d"){
+            evResults.d.class = "dem";
+          }
+
+          let allPVvotes = [pvResults.r.votes, pvResults.d.votes];
+          const maxPVvotes = Math.max(...allPVvotes);
+          const pvWinner = allPVvotes.indexOf(maxPVvotes) === 0 ? "r" : "d";
+
+          pvResults[pvWinner].weight = "bolder";
+
+          if(pvWinner === "r"){
+            pvResults.r.class = "rep";
+          }
+          if(pvWinner === "d"){
+            pvResults.d.class = "dem";
+          }
+
+          const allEVvotesSorted = allEVvotes.sort((a, b) => b - a);
+          const allPVvotesSorted = allPVvotes.sort((a, b) => b - a);
+
+          let marginEVtotal = formatNumber(allEVvotesSorted[0] - allEVvotesSorted[1], {
+            signDisplay: "always"
+          });
+
+          let marginPVtotal = formatNumber((allPVvotesSorted[0] - allPVvotesSorted[1]) / (allPVvotesSorted[0] + allPVvotesSorted[1]), {
+            style: "percent",
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1,
+            signDisplay: "always"
+          });
+
+          evResults[evWinner].margin = marginEVtotal;
+          pvResults[pvWinner].margin = marginPVtotal;
+
+          let evtr = "";
+          evtr += `<tr><td>${y}</td>`;
+
+          evtr += `<td class='${evResults.r.class}'><span style='color:${red}; font-weight: ${evResults.r.weight}'>${evResults.r.name}</span></td>`;
+          evtr += `<td class='${evResults.r.class}'><span style='color:${red}; font-weight: ${evResults.r.weight}'>${numberToText(evResults.r.votes)}</span></td>`;
+          evtr += `<td class='${evResults.r.class}'><span style='color:${red}; font-weight: ${evResults.r.weight}'>${evResults.r.margin}</span></td>`;
+
+          evtr += `<td class='${evResults.d.class}'><span style='color:${blue}; font-weight: ${evResults.d.weight}'>${evResults.d.name}</span></td>`;
+          evtr += `<td class='${evResults.d.class}'><span style='color:${blue}; font-weight: ${evResults.d.weight}'>${numberToText(evResults.d.votes)}</span></td>`;
+          evtr += `<td class='${evResults.d.class}'><span style='color:${blue}; font-weight: ${evResults.d.weight}'>${evResults.d.margin}</span></td>`;
+
+          evtr += "</tr>";
+
+          evTable += evtr;
+
+
+          let pvtr = "";
+          pvtr += `<tr><td>${y}</td>`;
+
+          pvtr += `<td class='${pvResults.r.class}'><span style='color:${red}; font-weight: ${pvResults.r.weight}'>${pvResults.r.name}</span></td>`;
+          pvtr += `<td class='${pvResults.r.class}'><span style='color:${red}; font-weight: ${pvResults.r.weight}'>${numberToText(pvResults.r.votes)}</span></td>`;
+          pvtr += `<td class='${pvResults.r.class}'><span style='color:${red}; font-weight: ${pvResults.r.weight}'>${pvResults.r.margin}</span></td>`;
+
+          pvtr += `<td class='${pvResults.d.class}'><span style='color:${blue}; font-weight: ${pvResults.d.weight}'>${pvResults.d.name}</span></td>`;
+          pvtr += `<td class='${pvResults.d.class}'><span style='color:${blue}; font-weight: ${pvResults.d.weight}'>${numberToText(pvResults.d.votes)}</span></td>`;
+          pvtr += `<td class='${pvResults.d.class}'><span style='color:${blue}; font-weight: ${pvResults.d.weight}'>${pvResults.d.margin}</span></td>`;
+
+          pvtr += "</tr>";
+
+          pvTable += pvtr;
+        });
+
+        evTable += "</table>";
+        // evTable = "<h4 style='text-align:center;'>Elector Vote Results</h4>" + evTable;
+
+        pvTable += "</table>";
+        // pvTable = "<h4 style='text-align:center;'>Popular Vote Results</h4>" + pvTable;
+
+        const tabs = `
+          <calcite-tabs>
+              <calcite-tab-nav slot="title-group">
+                  <calcite-tab-title selected>
+                    Elector Vote Total
+                  </calcite-tab-title>
+                  <calcite-tab-title>
+                    Popular Vote Total
+                  </calcite-tab-title>
+              </calcite-tab-nav>
+              <calcite-tab selected>
+                  ${evTable}
+              </calcite-tab>
+              <calcite-tab>
+                  ${pvTable}
+              </calcite-tab>
+          </calcite-tabs>
+        `
+
+        container.innerHTML = tabs;
+        return container;
+      }
+    });
+
+    content.push(electoralVoteResults);
+  } else {
+    content.push(...[
       new ExpressionContent({
         expressionInfo: {
           expression: `
@@ -510,6 +735,12 @@ export const statePopupTemplate = (params: PopupTemplateParams) => {
           `
         }
       })
-    ]
+    ]);
+  }
+
+  return new PopupTemplate({
+    title: fieldInfos.title[level],
+    fieldInfos: createFieldInfos(fieldNames),
+    content
   });
 };

@@ -2,24 +2,19 @@ import { SimpleRenderer } from "@arcgis/core/renderers";
 import CIMSymbol from "@arcgis/core/symbols/CIMSymbol";
 import { createSquareSymbolLayer } from "./symbolUtils";
 import { createColorPrimitiveOverride, createOffsetXPrimitiveOverride, createSizePrimitiveOverride } from "./expressionUtils";
-import { stateFieldPrefix } from "./config";
+import { stateFieldPrefix, years } from "./config";
+import { PopupTemplateParams } from "./popupUtils";
 
-
-interface CreateRendererParams {
-  isState: Boolean;
-}
-
-export function createRenderer (params: CreateRendererParams): SimpleRenderer {
-  const { isState } = params;
+export function createRenderer (params: PopupTemplateParams): SimpleRenderer {
+  const { level } = params;
   return new SimpleRenderer({
-    symbol: createSymbol({ isState })
-  })
+    symbol: createSymbol({ level })
+  });
 }
 
-function createSymbol (params: CreateRendererParams) {
-  const { isState } = params;
-
-  const fieldPrefix = isState ? stateFieldPrefix : "";
+function createSymbol (params: PopupTemplateParams) {
+  const { level } = params;
+  const fieldPrefix = level === "state" ? stateFieldPrefix : "";
 
   return new CIMSymbol({
     data: {
@@ -27,133 +22,39 @@ function createSymbol (params: CreateRendererParams) {
       symbol: {
         type: `CIMPointSymbol`,
         symbolLayers: [
-          // createSquareSymbolLayer({
-          //   primitiveName: "election-2000",
-          //   offsetX: -3,
-          //   color: [0,0,0,255],
-          //   donutEnabled: false
-          // }),
-          createSquareSymbolLayer({
-            primitiveName: "election-2004",
-            offsetX: -2,
-            color: [0,0,0,255],
-            donutEnabled: false
-          }),
-          createSquareSymbolLayer({
-            primitiveName: "election-2008",
-            offsetX: -1,
-            color: [0,0,0,255],
-            donutEnabled: false
-          }),
-          createSquareSymbolLayer({
-            primitiveName: "election-2012",
-            offsetX: 0,
-            color: [0,0,0,255],
-            donutEnabled: false
-          }),
-          createSquareSymbolLayer({
-            primitiveName: "election-2016",
-            offsetX: 1,
-            color: [0,0,0,255],
-            donutEnabled: false
-          }),
-          createSquareSymbolLayer({
-            primitiveName: "election-2020",
-            offsetX: 2,
-            color: [0,0,0,255],
-            donutEnabled: false
+          ...years.map(year => {
+            return createSquareSymbolLayer({
+              primitiveName: `election-${year}`,
+              offsetX: years.indexOf(year) - 2,
+              color: [0, 0, 0, 255],
+              donutEnabled: false
+            });
           })
         ]
       },
       primitiveOverrides: [
-        // createColorPrimitiveOverride({
-        //   primitiveName: "election-2000",
-        //   year: 2000
-        // }),
-        createColorPrimitiveOverride({
-          primitiveName: "election-2004",
-          year: 2004,
-          fieldPrefix
+        ...years.map(year => {
+          return createColorPrimitiveOverride({
+            primitiveName: `election-${year}`,
+            year,
+            fieldPrefix
+          });
         }),
-        createColorPrimitiveOverride({
-          primitiveName: "election-2008",
-          year: 2008,
-          fieldPrefix
+        ...years.map(year => {
+          return createSizePrimitiveOverride({
+            primitiveName: `election-${year}`,
+            year,
+            fieldPrefix,
+            level
+          });
         }),
-        createColorPrimitiveOverride({
-          primitiveName: "election-2012",
-          year: 2012,
-          fieldPrefix
-        }),
-        createColorPrimitiveOverride({
-          primitiveName: "election-2016",
-          year: 2016,
-          fieldPrefix
-        }),
-        createColorPrimitiveOverride({
-          primitiveName: "election-2020",
-          year: 2020,
-          fieldPrefix
-        }),
-
-        // createSizePrimitiveOverride({
-        //   primitiveName: "election-2000",
-        //   year: 2000
-        // }),
-        createSizePrimitiveOverride({
-          primitiveName: "election-2004",
-          year: 2004,
-          fieldPrefix
-        }),
-        createSizePrimitiveOverride({
-          primitiveName: "election-2008",
-          year: 2008,
-          fieldPrefix
-        }),
-        createSizePrimitiveOverride({
-          primitiveName: "election-2012",
-          year: 2012,
-          fieldPrefix
-        }),
-        createSizePrimitiveOverride({
-          primitiveName: "election-2016",
-          year: 2016,
-          fieldPrefix
-        }),
-        createSizePrimitiveOverride({
-          primitiveName: "election-2020",
-          year: 2020,
-          fieldPrefix
-        }),
-
-        // createOffsetXPrimitiveOverride({
-        //   primitiveName: "election-2000",
-        //   year: 2000
-        // }),
-        createOffsetXPrimitiveOverride({
-          primitiveName: "election-2004",
-          year: 2004,
-          fieldPrefix
-        }),
-        createOffsetXPrimitiveOverride({
-          primitiveName: "election-2008",
-          year: 2008,
-          fieldPrefix
-        }),
-        createOffsetXPrimitiveOverride({
-          primitiveName: "election-2012",
-          year: 2012,
-          fieldPrefix
-        }),
-        createOffsetXPrimitiveOverride({
-          primitiveName: "election-2016",
-          year: 2016,
-          fieldPrefix
-        }),
-        createOffsetXPrimitiveOverride({
-          primitiveName: "election-2020",
-          year: 2020,
-          fieldPrefix
+        ...years.map(year => {
+          return createOffsetXPrimitiveOverride({
+            primitiveName: `election-${year}`,
+            year,
+            fieldPrefix,
+            level
+          });
         })
       ]
     }
