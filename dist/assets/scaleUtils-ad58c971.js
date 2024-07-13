@@ -1,0 +1,1 @@
+import{b6 as u,b7 as i,b8 as c}from"./index-5bdaa4d1.js";const e=96;function b(n,t){const r=t||n.extent,o=n.width,f=u(r==null?void 0:r.spatialReference);return r&&o?r.width/o*f*i*e:0}function d(n,t){return n/(u(t)*i*e)}function h(n,t,r){return a(n,t)&&s(n,r)}function a(n,t){return t===0||c(n,t)||n<t}function s(n,t){return t===0||c(n,t)||n>t}export{h as d,b as i,d as o};

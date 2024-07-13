@@ -4,13 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no"/>
     <title>U.S. presidential elections</title>
-    <link rel="stylesheet" href="https://js.arcgis.com/4.28/@arcgis/core/assets/esri/themes/light/main.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/light/main.css">
     
-    <script type="module" crossorigin src="/elections-timeline/dist/assets/index-7df220b7.js"></script>
-    <link rel="stylesheet" href="/elections-timeline/dist/assets/index-0e712e80.css">
+
+    <script type="module" src="https://js.arcgis.com/calcite-components/2.9.0/calcite.esm.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.9.0/calcite.css" />
+    <script type="module" crossorigin src="/elections-timeline/dist/assets/index-5bdaa4d1.js"></script>
+    <link rel="stylesheet" href="/elections-timeline/dist/assets/index-d4471cb7.css">
   </head>
   <body>
-    <div id="viewDiv"></div>
-    
+    <calcite-shell>
+      <calcite-shell-panel slot="panel-start" position="start" width-scale="l">
+        <div id="legendDiv" class="calcite-match-height"></div>
+      </calcite-shell-panel>
+      <div id="viewDiv"></div>
+      
+    </calcite-shell>
   </body>
 </html>

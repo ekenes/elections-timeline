@@ -1,19 +1,20 @@
 import ArcGISMap from "@arcgis/core/Map.js";
 import MapView from "@arcgis/core/views/MapView.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
+import Features from "@arcgis/core/widgets/Features";
 import { createRenderer } from "./rendererUtils";
-import { statePopupTemplate } from "./popupUtils";
-import { countiesLayerPortalItem, scaleThreshold, statesLayerPortalItem } from "./config";
+import { createPopupTemplate } from "./popupUtils";
+import { countiesLayerPortalItem, scaleThreshold, statesLayerPortalItem, usaGraphic } from "./config";
 
 const stateLayer = new FeatureLayer({
   portalItem: {
     id: statesLayerPortalItem
   },
   renderer: createRenderer({
-    isState: true
+    level: "state"
   }),
-  popupTemplate: statePopupTemplate({
-    isState: true
+  popupTemplate: createPopupTemplate({
+    level: "state"
   }),
   maxScale: scaleThreshold,
   opacity: 1
@@ -24,13 +25,17 @@ const countyLayer = new FeatureLayer({
     id: countiesLayerPortalItem
   },
   renderer: createRenderer({
-    isState: false
+    level: "county"
   }),
-  popupTemplate: statePopupTemplate({
-    isState: false
+  popupTemplate: createPopupTemplate({
+    level: "county"
   }),
   minScale: scaleThreshold,
   opacity: 1
+});
+
+usaGraphic.popupTemplate = createPopupTemplate({
+  level: "country"
 });
 
 const map = new ArcGISMap({
@@ -42,9 +47,19 @@ const map = new ArcGISMap({
   layers: [ stateLayer, countyLayer ]
 });
 
-new MapView({
+const view = new MapView({
   map: map,
   container: "viewDiv",
   center: [-118.244, 34.052],
-  zoom: 3
+  zoom: 3,
+});
+
+const featuresWidget = new Features({
+  features: [usaGraphic],
+  visible: true,
+  container: document.getElementById("legendDiv")!,
+  visibleElements: {
+    closeButton: false,
+    actionBar: false
+  }
 });
