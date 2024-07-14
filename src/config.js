@@ -1,7 +1,12 @@
 import Color from "@arcgis/core/Color";
 import Graphic from "@arcgis/core/Graphic";
 import Point from "@arcgis/core/geometry/Point";
-export const basemapPortalItem = "fbfb62f3599f41e5a77845f863e2872f";
+export const basemapPortalItem = {
+    // web mercator
+    id: "fbfb62f3599f41e5a77845f863e2872f"
+    // albers usa
+    // id: "553a330a7ddc451087875d320bfe5dbd"
+};
 export const statesLayerPortalItem = "f2825b56dfc14bb892604637dab45104";
 export const countiesLayerPortalItem = "fe9e032e4a854c74890750214a3edd8b";
 export const maxScale = 4622324 / 16;

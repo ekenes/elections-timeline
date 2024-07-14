@@ -4,7 +4,7 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Features from "@arcgis/core/widgets/Features";
 import { createRenderer } from "./rendererUtils";
 import { createPopupTemplate } from "./popupUtils";
-import { countiesLayerPortalItem, scaleThreshold, statesLayerPortalItem, usaGraphic } from "./config";
+import { basemapPortalItem, countiesLayerPortalItem, scaleThreshold, statesLayerPortalItem, usaGraphic } from "./config";
 
 const stateLayer = new FeatureLayer({
   portalItem: {
@@ -40,9 +40,7 @@ usaGraphic.popupTemplate = createPopupTemplate({
 
 const map = new ArcGISMap({
   basemap: {
-    portalItem: {
-      id: "fbfb62f3599f41e5a77845f863e2872f"
-    }
+    portalItem: basemapPortalItem
   },
   layers: [ stateLayer, countyLayer ]
 });
