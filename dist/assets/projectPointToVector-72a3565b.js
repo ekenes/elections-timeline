@@ -1,0 +1,1 @@
+import{bS as p,dn as i,dp as o,bt as s}from"./index-76dad814.js";function x(t,r,e,f){if(p(t.spatialReference,e)){a[0]=t.x,a[1]=t.y;const c=t.z;return a[2]=c??f??0,i(a,t.spatialReference,0,r,e,0,1)}const n=o(t,e);return!!n&&(r[0]=n==null?void 0:n.x,r[1]=n==null?void 0:n.y,r[2]=(n==null?void 0:n.z)??f??0,!0)}const a=s();export{x as c};

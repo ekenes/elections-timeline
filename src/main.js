@@ -1,4 +1,4 @@
-import ArcGISMap from "@arcgis/core/Map.js";
+import WebMap from "@arcgis/core/WebMap.js";
 import MapView from "@arcgis/core/views/MapView.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Features from "@arcgis/core/widgets/Features";
@@ -55,19 +55,19 @@ const countyBoundaryLayer = new FeatureLayer({
 usaGraphic.popupTemplate = createPopupTemplate({
     level: "country"
 });
-const map = new ArcGISMap({
+const map = new WebMap({
     basemap: {
-        portalItem: basemapPortalItem
+        portalItem: basemapPortalItem,
     },
     layers: [stateLayer, countyBoundaryLayer, countyLayer]
 });
-const view = new MapView({
+new MapView({
     map: map,
     container: "viewDiv",
     center: [-118.244, 34.052],
     zoom: 3,
 });
-const featuresWidget = new Features({
+new Features({
     features: [usaGraphic],
     visible: true,
     container: document.getElementById("legendDiv"),
