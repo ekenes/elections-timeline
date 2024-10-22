@@ -5,6 +5,9 @@ import Features from "@arcgis/core/widgets/Features";
 import { createRenderer } from "./rendererUtils";
 import { createPopupTemplate } from "./popupUtils";
 import { basemapPortalItem, countiesLayerPortalItem, scaleThreshold, statesLayerPortalItem, usaGraphic } from "./config";
+import { SimpleRenderer } from "@arcgis/core/renderers";
+import SimpleFillSymbol from "@arcgis/core/symbols/SimpleFillSymbol";
+import SimpleLineSymbol from "@arcgis/core/symbols/SimpleLineSymbol";
 
 const stateLayer = new FeatureLayer({
   portalItem: {
@@ -17,7 +20,8 @@ const stateLayer = new FeatureLayer({
     level: "state"
   }),
   maxScale: scaleThreshold,
-  opacity: 1
+  opacity: 1,
+  effect: "drop-shadow(2px, 2px, 2px, lightgray)"
 });
 
 const countyLayer = new FeatureLayer({
@@ -31,7 +35,25 @@ const countyLayer = new FeatureLayer({
     level: "county"
   }),
   minScale: scaleThreshold,
-  opacity: 1
+  opacity: 1,
+  effect: "drop-shadow(2px, 2px, 2px, lightgray)"
+});
+
+const countyBoundaryLayer = new FeatureLayer({
+  portalItem: {
+    id: "14c5450526a8430298b2fa74da12c2f4"
+  },
+  minScale: scaleThreshold,
+  popupEnabled: false,
+  renderer: new SimpleRenderer({
+    symbol: new SimpleFillSymbol({
+      style: "none",
+      outline: new SimpleLineSymbol({
+        color: [175, 175, 175, 0.35],
+        width: 0.5
+      })
+    })
+  })
 });
 
 usaGraphic.popupTemplate = createPopupTemplate({
@@ -42,7 +64,7 @@ const map = new ArcGISMap({
   basemap: {
     portalItem: basemapPortalItem
   },
-  layers: [ stateLayer, countyLayer ]
+  layers: [ stateLayer, countyBoundaryLayer, countyLayer ]
 });
 
 const view = new MapView({
