@@ -197,6 +197,16 @@ export const stateChangeSizeStops = [
 
 // size is votes as a % of total state votes
 
+// export const countySizeStops = [
+//   { value: 0, size: 3 },
+//   { value: 1, size: 3.1 },
+//   { value: 2, size: 3.2 },
+//   // { value: 1000, size: 6 },
+//   { value: 50000, size: 10 },
+//   // { value: 50000, size: 14 },
+//   { value: 100000, size: 20 }
+// ];
+
 export const countySizeStops = [
   { value: 0, size: 3 },
   { value: 1000, size: 6 },

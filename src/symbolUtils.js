@@ -35,7 +35,7 @@ export function createSquareSymbolLayer(params) {
             type: `CIMSolidStroke`,
             enable: true,
             color: outline.color,
-            width: 2
+            width: 0.5
         });
     }
     const size = 10;

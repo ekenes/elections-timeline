@@ -27,7 +27,10 @@ function createSymbol (params: PopupTemplateParams) {
               primitiveName: `election-${year}`,
               offsetX: years.indexOf(year) - 2,
               color: [0, 0, 0, 255],
-              donutEnabled: false
+              donutEnabled: false,
+              outline: {
+                color: [255, 255, 255, 100],
+              }
             });
           })
         ]

@@ -48,7 +48,7 @@ export function createSquareSymbolLayer (params: CreateSymbolLayerParams){
       type: `CIMSolidStroke`,
       enable: true,
       color: outline.color,
-      width: 2
+      width: 0.5
     } as any);
   }
 

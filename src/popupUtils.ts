@@ -63,13 +63,16 @@ export const createPopupTemplate = (params: PopupTemplateParams) => {
             <p>
               This map shows the results of each of the previous 5 U.S. presidential elections from ${startYear} to ${endYear}. Each square represents the election winner for the given area in one year. The most recent election (${endYear}) is represented as the right-most square. Each square's color represents the winner of the election; its size is proportional to the margin of victory for the winner. Smaller squares indicate a closer election. Larger squares indicate a larger margin of victory.
             </p>
+            <img src="./trend-legend-horizontal.png" alt="Legend" />
+          </calcite-block>
+          <calcite-block collapsible open heading="Example trends">
             <p>
               Scroll through the symbols below to see examples of various trend patterns in the map.
             </p>
             <calcite-carousel label="Great new features">
               <calcite-carousel-item label="Gradual change">
                   <div class="custom-content">
-                      <img src="./gradual-d.png" alt="Gradual change" />
+                      <img class="examples" src="./gradual-d.png" alt="Gradual change" />
                       <span>
                         <b>Gradual change</b>. This example from Douglas County, Georgia shows a gradual swing from Republican support to Democrats over the last 5 elections. Voters showed strong support for Bush (R) in 2004. In 2008, the county leaned Democrat, and gradually increased support for Democrats in 2012, 2016, and 2020.
                       </span>
@@ -77,7 +80,7 @@ export const createPopupTemplate = (params: PopupTemplateParams) => {
               </calcite-carousel-item>
               <calcite-carousel-item label="Bowtie">
                   <div class="custom-content">
-                       <img src="./flip.png" alt="Bowtie" />
+                       <img class="examples" src="./flip.png" alt="Bowtie" />
                       <span>
                         <b>Bowtie</b>. In rare scenarios, some counties underwent a dramatic shift in support from one party to another. Anne Arundel County, Maryland went from strong Republican support in 2004 to strong Democrat support in 2020, creating a bowtie shape in the symbol.
                       </span>
@@ -85,7 +88,7 @@ export const createPopupTemplate = (params: PopupTemplateParams) => {
               </calcite-carousel-item>
               <calcite-carousel-item label="No change">
                   <div class="custom-content">
-                      <img src="./solid-r.png" alt="No change" />
+                      <img class="examples" src="./solid-r.png" alt="No change" />
                       <span>
                           <b>No change.</b> The populations of many areas are consistent in their support for one party over another. Shelby County, Alabama is an example of a county that has shown strong Republican support in each of the last 5 elections, posting margins of victory exceeding 40% in each of the previous 5 elections.
                       </span>
@@ -93,7 +96,7 @@ export const createPopupTemplate = (params: PopupTemplateParams) => {
               </calcite-carousel-item>
               <calcite-carousel-item label="Inconsistent">
                   <div class="custom-content">
-                       <img src="./contested.png" alt="Contested" />
+                       <img class="examples" src="./contested.png" alt="Contested" />
                       <span>
                           <b>Contested</b>. A few areas, especially in traditional swing states, have shown inconsistent support for either party over the last 5 elections. For example, Macomb County, Michigan showed strong support for Obama (D) in 2008 and 2012, but otherwise sided with Republicans in other elections.
                       </span>
