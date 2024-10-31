@@ -16,7 +16,7 @@ export const countiesLayerPortalItem = "fe9e032e4a854c74890750214a3edd8b";
 
 export const maxScale = 4622324/16;
 export const referenceScale = 2311162;
-export const scaleThreshold = 9244600;
+export const scaleThreshold = 6645106;
 export const stateReferenceScale = 18489200;
 
 export type validYears = 2000 | 2004 | 2008 | 2012 | 2016 | 2020;

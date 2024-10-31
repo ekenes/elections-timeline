@@ -101,6 +101,10 @@ const view = new MapView({
   },
 });
 
+view.watch("scale", (scale) => {
+  console.log(view.scale);
+});
+
 new Features({
   features: [usaGraphic],
   visible: true,
