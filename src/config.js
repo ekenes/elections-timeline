@@ -15,8 +15,8 @@ export const maxScale = 4622324 / 16;
 export const referenceScale = 2311162;
 export const scaleThreshold = 6645106;
 export const stateReferenceScale = 18489200;
-export const years = [2004, 2008, 2012, 2016, 2020, 2024];
-export const startYear = years[1];
+export const years = [2008, 2012, 2016, 2020, 2024];
+export const startYear = years[0];
 export const endYear = years[years.length - 1];
 export const usaGraphic = new Graphic({
     geometry: new Point({

@@ -21,9 +21,9 @@ export const stateReferenceScale = 18489200;
 
 export type validYears = 2000 | 2004 | 2008 | 2012 | 2016 | 2020 | 2024;
 
-export const years: Array<validYears> = [2004, 2008, 2012, 2016, 2020, 2024];
+export const years: Array<validYears> = [2008, 2012, 2016, 2020, 2024];
 
-export const startYear = years[1];
+export const startYear = years[0];
 export const endYear = years[years.length - 1];
 
 export const usaGraphic = new Graphic({
