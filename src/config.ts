@@ -19,11 +19,11 @@ export const referenceScale = 2311162;
 export const scaleThreshold = 6645106;
 export const stateReferenceScale = 18489200;
 
-export type validYears = 2000 | 2004 | 2008 | 2012 | 2016 | 2020;
+export type validYears = 2000 | 2004 | 2008 | 2012 | 2016 | 2020 | 2024;
 
-export const years: Array<validYears> = [2004, 2008, 2012, 2016, 2020];
+export const years: Array<validYears> = [2004, 2008, 2012, 2016, 2020, 2024];
 
-export const startYear = years[0];
+export const startYear = years[1];
 export const endYear = years[years.length - 1];
 
 export const usaGraphic = new Graphic({
@@ -61,9 +61,14 @@ export const usaGraphic = new Graphic({
     dem_ev_2016: 227,
     dem_2020: 81268856,
     rep_2020: 74216752,
-    oth_2020: 0,
+    oth_2020: 2922155,
     rep_ev_2020: 232,
-    dem_ev_2020: 306
+    dem_ev_2020: 306,
+    dem_2024: 75019257,
+    rep_2024: 77303573,
+    oth_2024: 3101635,
+    rep_ev_2024: 312,
+    dem_ev_2024: 226
   }
 });
 
@@ -146,6 +151,20 @@ export const results = {
     democrat: {
       candidate: "Biden",
       electoralVotes: 306
+    },
+    other: {
+      candidate: "Other",
+      electoralVotes: 0
+    }
+  },
+  2024: {
+    republican: {
+      candidate: "Trump",
+      electoralVotes: 312
+    },
+    democrat: {
+      candidate: "Harris",
+      electoralVotes: 226
     },
     other: {
       candidate: "Other",

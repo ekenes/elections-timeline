@@ -389,6 +389,20 @@ export const createPopupTemplate = (params) => {
                   candidate: "Other",
                   electoralVotes: 0
                 }
+              },
+              "2024": {
+                republican: {
+                  candidate: "Trump",
+                  electoralVotes: 312
+                },
+                democrat: {
+                  candidate: "Harris",
+                  electoralVotes: 226
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
               }
             };
 
@@ -567,6 +581,20 @@ export const createPopupTemplate = (params) => {
                 democrat: {
                   candidate: "Biden",
                   electoralVotes: 306
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0
+                }
+              },
+              "2024": {
+                republican: {
+                  candidate: "Trump",
+                  electoralVotes: 312
+                },
+                democrat: {
+                  candidate: "Harris",
+                  electoralVotes: 226
                 },
                 other: {
                   candidate: "Other",
