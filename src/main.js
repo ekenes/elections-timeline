@@ -2,7 +2,7 @@ import WebMap from "@arcgis/core/WebMap.js";
 import MapView from "@arcgis/core/views/MapView.js";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Features from "@arcgis/core/widgets/Features";
-import { createRenderer } from "./rendererUtils";
+import { createRenderer } from "./trendRenderer";
 import { createPopupTemplate } from "./popupUtils";
 import { basemapPortalItem, countiesLayerPortalItem, scaleThreshold, statesLayerPortalItem, usaGraphic, } from "./config";
 import { SimpleRenderer } from "@arcgis/core/renderers";
