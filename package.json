@@ -19,8 +19,8 @@
   },
   "homepage": "https://github.com/ekenes/elections-timeline#readme",
   "dependencies": {
-    "@arcgis/core": "4.30.0",
-    "@esri/calcite-components": "^2.10.1",
+    "@arcgis/core": "4.32.0-next.20250103",
+    "@esri/calcite-components": "^3.0.0-next.88",
     "vite": "^4.3.9"
   }
 }

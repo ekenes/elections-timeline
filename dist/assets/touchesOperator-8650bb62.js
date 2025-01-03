@@ -1,0 +1,1 @@
+import{t as r}from"./OperatorTouches-27ed77bf.js";import{fromGeometry as m,fromGeometryToGXGeometry as n}from"./jsonConverter-a6951154.js";import"./OperatorProject-2baa0db8.js";import"./SimpleGeometryCursor-e3941f41.js";import"./index-02eff6e6.js";const i=new r;function u(t,o){const e=m(t);return i.execute(e.getGeometry(),n(o),e.getSpatialReference(),null)}export{u as execute};
