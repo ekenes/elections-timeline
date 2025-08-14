@@ -1,15 +1,28 @@
 import PopupTemplate from "@arcgis/core/PopupTemplate";
 import FieldInfo from "@arcgis/core/popup/FieldInfo";
 import FieldInfoFormat from "@arcgis/core/popup/support/FieldInfoFormat";
-import { convertNumberFormatToIntlOptions, formatNumber } from "@arcgis/core/intl";
+import {
+  convertNumberFormatToIntlOptions,
+  formatNumber,
+} from "@arcgis/core/intl";
 import { CustomContent, ExpressionContent } from "@arcgis/core/popup/content";
-import { years, fieldInfos, dColor, rColor, oColor, stateFieldPrefix, startYear, endYear, results } from "./config";
+import {
+  years,
+  fieldInfos,
+  dColor,
+  rColor,
+  oColor,
+  stateFieldPrefix,
+  startYear,
+  endYear,
+  results,
+} from "./config";
 function numberToText(num) {
-    const numberFormatIntlOptions = convertNumberFormatToIntlOptions({
-        places: 0,
-        digitSeparator: true
-    });
-    return formatNumber(num, numberFormatIntlOptions);
+  const numberFormatIntlOptions = convertNumberFormatToIntlOptions({
+    places: 0,
+    digitSeparator: true,
+  });
+  return formatNumber(num, numberFormatIntlOptions);
 }
 ////////////////////////////////////////////////////
 //
@@ -17,33 +30,35 @@ function numberToText(num) {
 //
 ///////////////////////////////////////////////////
 function createFieldInfos(fieldNames) {
-    return fieldNames.map(fieldName => {
-        return new FieldInfo({
-            fieldName,
-            format: new FieldInfoFormat({
-                places: 0,
-                digitSeparator: true
-            })
-        });
+  return fieldNames.map((fieldName) => {
+    return new FieldInfo({
+      fieldName,
+      format: new FieldInfoFormat({
+        places: 0,
+        digitSeparator: true,
+      }),
     });
+  });
 }
 export const createPopupTemplate = (params) => {
-    const { level } = params;
-    const fieldPrefix = level === "state" ? stateFieldPrefix : "";
-    const fieldNames = years.map(year => {
-        return [
-            `${fieldPrefix}rep_${year}`,
-            `${fieldPrefix}dem_${year}`,
-            `${fieldPrefix}oth_${year}`,
-        ];
-    }).flat();
-    let content = [];
-    if (level === "country") {
-        const instructions = new CustomContent({
-            creator: () => {
-                const container = document.createElement("div");
-                container.id = "instructions";
-                container.innerHTML = `
+  const { level } = params;
+  const fieldPrefix = level === "state" ? stateFieldPrefix : "";
+  const fieldNames = years
+    .map((year) => {
+      return [
+        `${fieldPrefix}rep_${year}`,
+        `${fieldPrefix}dem_${year}`,
+        `${fieldPrefix}oth_${year}`,
+      ];
+    })
+    .flat();
+  let content = [];
+  if (level === "country") {
+    const instructions = new CustomContent({
+      creator: () => {
+        const container = document.createElement("div");
+        container.id = "instructions";
+        container.innerHTML = `
           <calcite-block collapsible open heading="How to read this map">
             <p>
               This map shows the results of each of the previous 5 U.S. presidential elections from ${startYear} to ${endYear}. Each square represents the election winner for the given area in one year. The most recent election (${endYear}) is represented as the right-most square. Each square's color represents the winner of the election; its size is proportional to the margin of victory for the winner. Smaller squares indicate a closer election. Larger squares indicate a larger margin of victory.
@@ -90,115 +105,140 @@ export const createPopupTemplate = (params) => {
           </calcite-carousel>
         </calcite-block>
         `;
-                return container;
+        return container;
+      },
+    });
+    content.push(instructions);
+    const electoralVoteResults = new CustomContent({
+      creator: (event) => {
+        const { graphic } = event;
+        const container = document.createElement("div");
+        container.id = "electoral-vote-results";
+        let evTable = "<table class='esri-widget popup'>";
+        evTable +=
+          "<tr class='head'><td>Year</td><td>Republican</td><td>Votes</td><td>+/-</td><td>Democrat</td><td>Votes</td><td>+/-</td></tr>";
+        let pvTable = "<table class='esri-widget popup'>";
+        pvTable +=
+          "<tr class='head'><td>Year</td><td>Republican</td><td>Votes</td><td>%</td><td>Democrat</td><td>Votes</td><td>%</td></tr>";
+        const candidates = JSON.parse(JSON.stringify(results));
+        const red = `rgba(${rColor.toRgba()})`;
+        const blue = `rgba(${dColor.toRgba()})`;
+        years.forEach((i) => {
+          var y = i.toString();
+          const evResults = {
+            r: {
+              name: candidates[y].republican.candidate,
+              votes: candidates[y].republican.electoralVotes,
+              weight: "normal",
+              class: "none",
+              margin: "-",
+            },
+            d: {
+              name: candidates[y].democrat.candidate,
+              votes: candidates[y].democrat.electoralVotes,
+              weight: "normal",
+              class: "none",
+              margin: "-",
+            },
+          };
+          const pvResults = {
+            r: {
+              name: candidates[y].republican.candidate,
+              votes: graphic.attributes[`rep_${y}`],
+              weight: "normal",
+              class: "none",
+              margin: "-",
+            },
+            d: {
+              name: candidates[y].democrat.candidate,
+              votes: graphic.attributes[`dem_${y}`],
+              weight: "normal",
+              class: "none",
+              margin: "-",
+            },
+          };
+          let allEVvotes = [evResults.r.votes, evResults.d.votes];
+          const maxEVvotes = Math.max(...allEVvotes);
+          const evWinner = allEVvotes.indexOf(maxEVvotes) === 0 ? "r" : "d";
+          evResults[evWinner].weight = "bolder";
+          if (evWinner === "r") {
+            evResults.r.class = "rep";
+          }
+          if (evWinner === "d") {
+            evResults.d.class = "dem";
+          }
+          let allPVvotes = [pvResults.r.votes, pvResults.d.votes];
+          const maxPVvotes = Math.max(...allPVvotes);
+          const pvWinner = allPVvotes.indexOf(maxPVvotes) === 0 ? "r" : "d";
+          pvResults[pvWinner].weight = "bolder";
+          if (pvWinner === "r") {
+            pvResults.r.class = "rep";
+          }
+          if (pvWinner === "d") {
+            pvResults.d.class = "dem";
+          }
+          const allEVvotesSorted = allEVvotes.sort((a, b) => b - a);
+          const allPVvotesSorted = allPVvotes.sort((a, b) => b - a);
+          let marginEVtotal = formatNumber(
+            allEVvotesSorted[0] - allEVvotesSorted[1],
+            {
+              signDisplay: "always",
             }
+          );
+          let marginPVtotal = formatNumber(
+            (allPVvotesSorted[0] - allPVvotesSorted[1]) /
+              (allPVvotesSorted[0] + allPVvotesSorted[1]),
+            {
+              style: "percent",
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+              signDisplay: "always",
+            }
+          );
+          evResults[evWinner].margin = marginEVtotal;
+          pvResults[pvWinner].margin = marginPVtotal;
+          let evtr = "";
+          evtr += `<tr><td>${y}</td>`;
+          evtr += `<td class='${evResults.r.class}'><span style='color:${red}; font-weight: ${evResults.r.weight}'>${evResults.r.name}</span></td>`;
+          evtr += `<td class='${
+            evResults.r.class
+          }'><span style='color:${red}; font-weight: ${
+            evResults.r.weight
+          }'>${numberToText(evResults.r.votes)}</span></td>`;
+          evtr += `<td class='${evResults.r.class}'><span style='color:${red}; font-weight: ${evResults.r.weight}'>${evResults.r.margin}</span></td>`;
+          evtr += `<td class='${evResults.d.class}'><span style='color:${blue}; font-weight: ${evResults.d.weight}'>${evResults.d.name}</span></td>`;
+          evtr += `<td class='${
+            evResults.d.class
+          }'><span style='color:${blue}; font-weight: ${
+            evResults.d.weight
+          }'>${numberToText(evResults.d.votes)}</span></td>`;
+          evtr += `<td class='${evResults.d.class}'><span style='color:${blue}; font-weight: ${evResults.d.weight}'>${evResults.d.margin}</span></td>`;
+          evtr += "</tr>";
+          evTable += evtr;
+          let pvtr = "";
+          pvtr += `<tr><td>${y}</td>`;
+          pvtr += `<td class='${pvResults.r.class}'><span style='color:${red}; font-weight: ${pvResults.r.weight}'>${pvResults.r.name}</span></td>`;
+          pvtr += `<td class='${
+            pvResults.r.class
+          }'><span style='color:${red}; font-weight: ${
+            pvResults.r.weight
+          }'>${numberToText(pvResults.r.votes)}</span></td>`;
+          pvtr += `<td class='${pvResults.r.class}'><span style='color:${red}; font-weight: ${pvResults.r.weight}'>${pvResults.r.margin}</span></td>`;
+          pvtr += `<td class='${pvResults.d.class}'><span style='color:${blue}; font-weight: ${pvResults.d.weight}'>${pvResults.d.name}</span></td>`;
+          pvtr += `<td class='${
+            pvResults.d.class
+          }'><span style='color:${blue}; font-weight: ${
+            pvResults.d.weight
+          }'>${numberToText(pvResults.d.votes)}</span></td>`;
+          pvtr += `<td class='${pvResults.d.class}'><span style='color:${blue}; font-weight: ${pvResults.d.weight}'>${pvResults.d.margin}</span></td>`;
+          pvtr += "</tr>";
+          pvTable += pvtr;
         });
-        content.push(instructions);
-        const electoralVoteResults = new CustomContent({
-            creator: (event) => {
-                const { graphic } = event;
-                const container = document.createElement("div");
-                container.id = "electoral-vote-results";
-                let evTable = "<table class='esri-widget popup'>";
-                evTable += "<tr class='head'><td>Year</td><td>Republican</td><td>Votes</td><td>+/-</td><td>Democrat</td><td>Votes</td><td>+/-</td></tr>";
-                let pvTable = "<table class='esri-widget popup'>";
-                pvTable += "<tr class='head'><td>Year</td><td>Republican</td><td>Votes</td><td>%</td><td>Democrat</td><td>Votes</td><td>%</td></tr>";
-                const candidates = JSON.parse(JSON.stringify(results));
-                const red = `rgba(${rColor.toRgba()})`;
-                const blue = `rgba(${dColor.toRgba()})`;
-                years.forEach((i) => {
-                    var y = i.toString();
-                    const evResults = {
-                        r: {
-                            name: candidates[y].republican.candidate,
-                            votes: candidates[y].republican.electoralVotes,
-                            weight: "normal",
-                            class: "none",
-                            margin: "-"
-                        },
-                        d: {
-                            name: candidates[y].democrat.candidate,
-                            votes: candidates[y].democrat.electoralVotes,
-                            weight: "normal",
-                            class: "none",
-                            margin: "-"
-                        }
-                    };
-                    const pvResults = {
-                        r: {
-                            name: candidates[y].republican.candidate,
-                            votes: graphic.attributes[`rep_${y}`],
-                            weight: "normal",
-                            class: "none",
-                            margin: "-"
-                        },
-                        d: {
-                            name: candidates[y].democrat.candidate,
-                            votes: graphic.attributes[`dem_${y}`],
-                            weight: "normal",
-                            class: "none",
-                            margin: "-"
-                        }
-                    };
-                    let allEVvotes = [evResults.r.votes, evResults.d.votes];
-                    const maxEVvotes = Math.max(...allEVvotes);
-                    const evWinner = allEVvotes.indexOf(maxEVvotes) === 0 ? "r" : "d";
-                    evResults[evWinner].weight = "bolder";
-                    if (evWinner === "r") {
-                        evResults.r.class = "rep";
-                    }
-                    if (evWinner === "d") {
-                        evResults.d.class = "dem";
-                    }
-                    let allPVvotes = [pvResults.r.votes, pvResults.d.votes];
-                    const maxPVvotes = Math.max(...allPVvotes);
-                    const pvWinner = allPVvotes.indexOf(maxPVvotes) === 0 ? "r" : "d";
-                    pvResults[pvWinner].weight = "bolder";
-                    if (pvWinner === "r") {
-                        pvResults.r.class = "rep";
-                    }
-                    if (pvWinner === "d") {
-                        pvResults.d.class = "dem";
-                    }
-                    const allEVvotesSorted = allEVvotes.sort((a, b) => b - a);
-                    const allPVvotesSorted = allPVvotes.sort((a, b) => b - a);
-                    let marginEVtotal = formatNumber(allEVvotesSorted[0] - allEVvotesSorted[1], {
-                        signDisplay: "always"
-                    });
-                    let marginPVtotal = formatNumber((allPVvotesSorted[0] - allPVvotesSorted[1]) / (allPVvotesSorted[0] + allPVvotesSorted[1]), {
-                        style: "percent",
-                        minimumFractionDigits: 1,
-                        maximumFractionDigits: 1,
-                        signDisplay: "always"
-                    });
-                    evResults[evWinner].margin = marginEVtotal;
-                    pvResults[pvWinner].margin = marginPVtotal;
-                    let evtr = "";
-                    evtr += `<tr><td>${y}</td>`;
-                    evtr += `<td class='${evResults.r.class}'><span style='color:${red}; font-weight: ${evResults.r.weight}'>${evResults.r.name}</span></td>`;
-                    evtr += `<td class='${evResults.r.class}'><span style='color:${red}; font-weight: ${evResults.r.weight}'>${numberToText(evResults.r.votes)}</span></td>`;
-                    evtr += `<td class='${evResults.r.class}'><span style='color:${red}; font-weight: ${evResults.r.weight}'>${evResults.r.margin}</span></td>`;
-                    evtr += `<td class='${evResults.d.class}'><span style='color:${blue}; font-weight: ${evResults.d.weight}'>${evResults.d.name}</span></td>`;
-                    evtr += `<td class='${evResults.d.class}'><span style='color:${blue}; font-weight: ${evResults.d.weight}'>${numberToText(evResults.d.votes)}</span></td>`;
-                    evtr += `<td class='${evResults.d.class}'><span style='color:${blue}; font-weight: ${evResults.d.weight}'>${evResults.d.margin}</span></td>`;
-                    evtr += "</tr>";
-                    evTable += evtr;
-                    let pvtr = "";
-                    pvtr += `<tr><td>${y}</td>`;
-                    pvtr += `<td class='${pvResults.r.class}'><span style='color:${red}; font-weight: ${pvResults.r.weight}'>${pvResults.r.name}</span></td>`;
-                    pvtr += `<td class='${pvResults.r.class}'><span style='color:${red}; font-weight: ${pvResults.r.weight}'>${numberToText(pvResults.r.votes)}</span></td>`;
-                    pvtr += `<td class='${pvResults.r.class}'><span style='color:${red}; font-weight: ${pvResults.r.weight}'>${pvResults.r.margin}</span></td>`;
-                    pvtr += `<td class='${pvResults.d.class}'><span style='color:${blue}; font-weight: ${pvResults.d.weight}'>${pvResults.d.name}</span></td>`;
-                    pvtr += `<td class='${pvResults.d.class}'><span style='color:${blue}; font-weight: ${pvResults.d.weight}'>${numberToText(pvResults.d.votes)}</span></td>`;
-                    pvtr += `<td class='${pvResults.d.class}'><span style='color:${blue}; font-weight: ${pvResults.d.weight}'>${pvResults.d.margin}</span></td>`;
-                    pvtr += "</tr>";
-                    pvTable += pvtr;
-                });
-                evTable += "</table>";
-                // evTable = "<h4 style='text-align:center;'>Elector Vote Results</h4>" + evTable;
-                pvTable += "</table>";
-                // pvTable = "<h4 style='text-align:center;'>Popular Vote Results</h4>" + pvTable;
-                const tabs = `
+        evTable += "</table>";
+        // evTable = "<h4 style='text-align:center;'>Elector Vote Results</h4>" + evTable;
+        pvTable += "</table>";
+        // pvTable = "<h4 style='text-align:center;'>Popular Vote Results</h4>" + pvTable;
+        const tabs = `
           <calcite-tabs>
               <calcite-tab-nav slot="title-group">
                   <calcite-tab-title selected>
@@ -216,17 +256,17 @@ export const createPopupTemplate = (params) => {
               </calcite-tab>
           </calcite-tabs>
         `;
-                container.innerHTML = tabs;
-                return container;
-            }
-        });
-        content.push(electoralVoteResults);
-    }
-    else {
-        content.push(...[
-            new ExpressionContent({
-                expressionInfo: {
-                    expression: `
+        container.innerHTML = tabs;
+        return container;
+      },
+    });
+    content.push(electoralVoteResults);
+  } else {
+    content.push(
+      ...[
+        new ExpressionContent({
+          expressionInfo: {
+            expression: `
             Expects($feature, "*");
 
             var result = "";
@@ -297,12 +337,12 @@ export const createPopupTemplate = (params) => {
               type: "text",
               text: result
             };
-          `
-                }
-            }),
-            new ExpressionContent({
-                expressionInfo: {
-                    expression: `
+          `,
+          },
+        }),
+        new ExpressionContent({
+          expressionInfo: {
+            expression: `
             Expects($feature, "*");
             var years = [${years}];
             var candidates = {
@@ -389,7 +429,21 @@ export const createPopupTemplate = (params) => {
                   candidate: "Other",
                   electoralVotes: 0
                 }
-              }
+              },
+              "2024": {
+                republican: {
+                  candidate: "Trump",
+                  electoralVotes: 312,
+                },
+                democrat: {
+                  candidate: "Harris",
+                  electoralVotes: 226,
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0,
+                },
+              },
             };
 
 
@@ -474,12 +528,12 @@ export const createPopupTemplate = (params) => {
               type: "text",
               text: table
             }
-          `
-                }
-            }),
-            new ExpressionContent({
-                expressionInfo: {
-                    expression: `
+          `,
+          },
+        }),
+        new ExpressionContent({
+          expressionInfo: {
+            expression: `
             Expects($feature, "*");
             var fieldsMargin = [];
             var fieldsTotal = [];
@@ -572,7 +626,21 @@ export const createPopupTemplate = (params) => {
                   candidate: "Other",
                   electoralVotes: 0
                 }
-              }
+              },
+              "2024": {
+                republican: {
+                  candidate: "Trump",
+                  electoralVotes: 312,
+                },
+                democrat: {
+                  candidate: "Harris",
+                  electoralVotes: 226,
+                },
+                other: {
+                  candidate: "Other",
+                  electoralVotes: 0,
+                },
+              },
             };
 
             var rColor = [${rColor.toJSON()}];
@@ -686,15 +754,16 @@ export const createPopupTemplate = (params) => {
               attributes,
               mediaInfos
             };
-          `
-                }
-            })
-        ]);
-    }
-    return new PopupTemplate({
-        title: fieldInfos.title[level],
-        fieldInfos: createFieldInfos(fieldNames),
-        content
-    });
+          `,
+          },
+        }),
+      ]
+    );
+  }
+  return new PopupTemplate({
+    title: fieldInfos.title[level],
+    fieldInfos: createFieldInfos(fieldNames),
+    content,
+  });
 };
 //# sourceMappingURL=popupUtils.js.map
