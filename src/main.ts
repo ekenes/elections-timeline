@@ -90,7 +90,7 @@ const view = new MapView({
   }),
   constraints: {
     snapToZoom: false,
-    minScale: 15595144*2,
+    minScale: 15595144 * 2,
     geometry: new Extent({
       spatialReference: { wkid: 5070 },
       xmin: -3035186.0631622137,
@@ -99,6 +99,76 @@ const view = new MapView({
       ymax: 4149284.633137403,
     }),
   },
+});
+
+view.when(() => {
+  let activeWidget: any = null;
+
+  const handleActionBarClick = ({ target }: any) => {
+    if (!document) {
+      return;
+    }
+    if (target.tagName !== "CALCITE-ACTION") {
+      return;
+    }
+
+    const calciteShellPanel = document.querySelector(
+      "calcite-shell-panel"
+    ) as any;
+
+    if (activeWidget) {
+      (document as any).querySelector(
+        `[data-action-id=${activeWidget}]`
+      ).active = false;
+      (document as any).querySelector(
+        `[data-panel-id=${activeWidget}]`
+      ).closed = true;
+    }
+
+    const nextWidget = target.dataset.actionId;
+    if (nextWidget !== activeWidget) {
+      calciteShellPanel!.collapsed = false;
+      (document as any).querySelector(`[data-action-id=${nextWidget}]`).active =
+        true;
+      (document as any).querySelector(`[data-panel-id=${nextWidget}]`).closed =
+        false;
+      activeWidget = nextWidget;
+      (document as any)
+        .querySelector(`[data-panel-id=${nextWidget}]`)
+        .setFocus();
+    } else {
+      activeWidget = null;
+      calciteShellPanel!.collapsed = true;
+    }
+  };
+
+  // Panel interaction
+  const panelEls = document.querySelectorAll("calcite-panel");
+  for (let i = 0; i < panelEls.length; i++) {
+    panelEls[i].addEventListener("calcitePanelClose", () => {
+      const calciteShellPanel = document.querySelector(
+        "calcite-shell-panel"
+      ) as any;
+      calciteShellPanel!.collapsed = true;
+      (document as any).querySelector(
+        `[data-action-id=${activeWidget}]`
+      ).active = false;
+      (document as any)
+        .querySelector(`[data-action-id=${activeWidget}]`)
+        .setFocus();
+      activeWidget = null;
+    });
+  }
+
+  (document as any)
+    .querySelector("calcite-action-bar")
+    .addEventListener("click", handleActionBarClick);
+
+  let actionBarExpanded = false;
+
+  document.addEventListener("calciteActionBarToggle", (event) => {
+    actionBarExpanded = !actionBarExpanded;
+  });
 });
 
 view.watch("scale", (scale) => {
