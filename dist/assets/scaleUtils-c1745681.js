@@ -1,0 +1,2 @@
+import{bs as o,bt as i,bu as c}from"./index-66a1325f.js";const e=96;function b(t,n){const r=n||t.extent,u=t.width,f=o(r==null?void 0:r.spatialReference);return r&&u?r.width/u*f*i*e:0}function d(t,n){return t/(o(n)*i*e)}function h(t,n,r){return s(t,n)&&a(t,r)}function s(t,n){return n===0||c(t,n)||t<n}function a(t,n){return n===0||c(t,n)||t>n}export{h as d,b as i,d as o};
+//# sourceMappingURL=scaleUtils-c1745681.js.map

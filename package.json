@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build --base=/elections-timeline/dist/",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   "dependencies": {
     "@arcgis/core": "4.30.0",
     "@esri/calcite-components": "^2.10.1",
+    "gh-pages": "^6.3.0",
     "vite": "^4.3.9"
   }
 }
