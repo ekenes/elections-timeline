@@ -1,0 +1,5 @@
+import{m as a}from"./index-c2b82012.js";/*!
+ * All material copyright ESRI, All Rights Reserved, unless otherwise specified.
+ * See https://github.com/Esri/calcite-design-system/blob/dev/LICENSE.md for details.
+ * v3.0.0-next.88
+*/const o="calcite-list",n="calcite-list-item-group",c="calcite-list-item";function r(s){var t;const e=(t=s.parentElement)==null?void 0:t.closest(c);e&&(e.open=!0,r(e))}function f(s){const e=s.assignedElements({flatten:!0}),t=e.filter(i=>i==null?void 0:i.matches(n)).map(i=>Array.from(i.querySelectorAll(c))).flat(),l=e.filter(i=>i==null?void 0:i.matches(c));return{lists:e.filter(i=>i==null?void 0:i.matches(o)),items:t.concat(l)}}function u(s){const e=s.assignedElements({flatten:!0}).filter(t=>t==null?void 0:t.matches(c));e.forEach(t=>{t.setPosition=e.indexOf(t)+1,t.setSize=e.length})}function h(s,e=!1){if(!a())return 0;const t=e?"ancestor::calcite-list-item | ancestor::calcite-list-item-group":"ancestor::calcite-list-item";return document.evaluate(t,s,null,XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,null).snapshotLength}export{r as a,o as c,f,u as h,c as i,n as o,h as p};

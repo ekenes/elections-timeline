@@ -1,24 +1,38 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no"/>
-    <title>U.S. presidential elections</title>
-    <link rel="stylesheet" href="https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/light/main.css">
-    
 
-    <script type="module" src="https://js.arcgis.com/calcite-components/2.9.0/calcite.esm.js"></script>
-    <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.9.0/calcite.css" />
-    <script type="module" crossorigin src="/elections-timeline/dist/assets/index-fc6a9042.js"></script>
-    <link rel="stylesheet" href="/elections-timeline/dist/assets/index-d85835aa.css">
-  </head>
-  <body>
-    <calcite-shell>
-      <calcite-shell-panel slot="panel-start" position="start" width-scale="l">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>U.S. presidential elections</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.30/@arcgis/core/assets/esri/themes/light/main.css">
+  
+
+  <script type="module" src="https://js.arcgis.com/calcite-components/2.9.0/calcite.esm.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://js.arcgis.com/calcite-components/2.9.0/calcite.css" />
+  <script type="module" crossorigin src="/elections-timeline/dist/assets/index-c2b82012.js"></script>
+  <link rel="stylesheet" href="/elections-timeline/dist/assets/index-c76e6b87.css">
+</head>
+
+<body>
+  <calcite-shell>
+    <calcite-navigation slot="header">
+      <calcite-navigation-logo slot="logo" heading="U.S. Presidential Election Results"
+        class="temp-header"></calcite-navigation-logo>
+    </calcite-navigation>
+    <calcite-shell-panel slot="panel-start" position="start" width-scale="l" display-mode="dock" collapsed>
+      <calcite-action-bar slot="action-bar">
+        <calcite-action data-action-id="information" icon="information" text="Information"></calcite-action>
+      </calcite-action-bar>
+
+
+      <calcite-panel heading="Details" data-panel-id="information" closed closable>
         <div id="legendDiv" class="calcite-match-height"></div>
-      </calcite-shell-panel>
-      <div id="viewDiv"></div>
-      
-    </calcite-shell>
-  </body>
+      </calcite-panel>
+    </calcite-shell-panel>
+    <div id="viewDiv"></div>
+    
+  </calcite-shell>
+</body>
+
 </html>
